@@ -1,0 +1,28 @@
+{
+  "name": "zowninative",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "license": "GPL-3.0",
+  "dependencies": {
+    "d3-interpolate": "^1.1.1",
+    "d3-scale": "^1.0.2",
+    "d3-shape": "^1.0.4",
+    "lodash": "^4.13.1",
+    "moment": "^2.13.0",
+    "moment-timezone": "^0.5.4",
+    "react": "^15.3.2",
+    "react-native": "^0.34.0",
+    "react-native-blur": "^1.0.1",
+    "react-native-fbsdk": "^0.4.0",
+    "react-native-locale": "0.0.11",
+    "react-native-svg": "^4.3.1",
+    "react-redux": "^4.4.5",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.10.2"
+  }
+}

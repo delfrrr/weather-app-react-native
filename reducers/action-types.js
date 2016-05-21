@@ -1,0 +1,40 @@
+/**
+ * @module action-types
+ */
+
+const actions = [
+    'SET_POSITION',
+    'SET_LOCALITY',
+    'CHANGE_DATE', //opens date picker
+    'CLOSE_DATE_SELECT',
+    'SET_DATE',
+    'SET_TIMEZONE',
+    'SET_CURRENT_WEATHER',
+    'SET_HOURLY_WEATHER',
+    'SET_MIN_TEMPERATURE',
+    'SET_MAX_TEMPERATURE',
+    'SET_TEMPERATURE_FORMAT',
+    'TOGGLE_BAR',
+    'SET_APPARENT_TEMPERATURE', //on/off feels like temp
+    'RESET_BAR',
+    'SET_HOUR_RANGE',
+    'TOGGLE_CITY_SELECT',
+    'SET_CITY_SEARCH_RESULT',
+    'LOAD_STATE_FROM_STORAGE',
+    'SET_SELECTED_LOCALITIES',
+    'ADD_SELECTED_LOCALITY',
+    'SET_LOCALITIES',
+    'ADD_LOCALITY',
+    'REMOVE_LOCALITY',
+    'FORECAST_REQUEST',
+    'SET_FORECAST_REQ',
+    'SET_CHART_FORMAT'
+];
+
+/**
+ * @enum {string}
+ */
+module.exports = actions.reduce((actionTypes, action) => {
+    actionTypes[action] = action;
+    return actionTypes;
+}, {});

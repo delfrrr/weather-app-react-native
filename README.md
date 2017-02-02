@@ -6,8 +6,8 @@ The source code is published for knowledge sharing purposes.
 # Demo
 <table>
     <tr>
-        <td>[![Weather-App-React-Native](http://i.giphy.com/Ow17HWlGTmtfG.gif)](https://www.youtube.com/watch?v=Z0eKfLKoo7w)</td>
-        <td>[![Weather-App-React-Native](http://i.imgur.com/NVbNQB3.png)](http://zowni.com)</td>
+        <td><a href="https://www.youtube.com/watch?v=Z0eKfLKoo7w"><img src="http://i.giphy.com/Ow17HWlGTmtfG.gif" alt="Weather-App-React-Native"/></a></td>
+        <td><a title="iOS app for comparing weather forecast with historical data" href="http://zowni.com"><img src="http://i.imgur.com/NVbNQB3.png" alt="Get invite on Apple TestFlight"/></a></td>
     </tr>
 </table>
 

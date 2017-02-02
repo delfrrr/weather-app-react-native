@@ -1,14 +1,20 @@
 # Weather-App-React-Native
 
 iOS app for comparing weather forecast with historical data built with [react-native](https://facebook.github.io/react-native/).
-
 The source code is published for knowledge sharing purposes.
 
 # Demo
-![Weather-App-React-Native](http://i.giphy.com/Ow17HWlGTmtfG.gif)
+<table>
+    <tr>
+        <td>[![Weather-App-React-Native](http://i.giphy.com/Ow17HWlGTmtfG.gif)](https://www.youtube.com/watch?v=Z0eKfLKoo7w)</td>
+        <td>[![Weather-App-React-Native](http://i.imgur.com/NVbNQB3.png)](http://zowni.com)</td>
+    </tr>
+</table>
 
-* [Full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
-* [Download app through the Apple TestFlight](http://zowni.com)
+
+* [Veiw full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
+* [Get invite on Apple TestFlight](http://zowni.com)
+
 
 # Used components
 
@@ -32,8 +38,8 @@ Check `package.json` for details
 
 ```
 {
-   "DARK_SKY_API_KEY": "{DARK_SKY_API_KEY}",
-   "MAPZEN_API_KEY": "{MAPZEN_API_KEY}"
+    "DARK_SKY_API_KEY": "{DARK_SKY_API_KEY}",
+    "MAPZEN_API_KEY": "{MAPZEN_API_KEY}"
 }
 ```
 

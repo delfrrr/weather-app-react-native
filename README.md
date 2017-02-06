@@ -42,5 +42,7 @@ Check `package.json` for details
     "MAPZEN_API_KEY": "{MAPZEN_API_KEY}"
 }
 ```
+* setup FacebookSDK as [described here](https://github.com/facebook/react-native-fbsdk)
+* type `$ ./node_modules/.bin/react-native link`
 
 Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just leave your email at http://zowni.com and get a link to download the app.

@@ -597,7 +597,8 @@ module.exports.setChartType = function (chartType) {
     this.dispatch({
         type: actionTypes.SET_CHART_FORMAT,
         value: chartType
-    })
+    });
+    this.setHourlyMinMax();
 }
 
 /**

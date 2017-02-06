@@ -92,7 +92,7 @@ module.exports = connect(
     },
     render () {
         const padding = 0;
-        let {width, curveHeight, viewHeight} = getDimensions();
+        let {width, viewHeight} = getDimensions();
         width += 2 * padding;
         const {stops} = this.state;
         const {chartType} = this.props;
@@ -115,11 +115,7 @@ module.exports = connect(
                         y2: viewHeight
                     },
                     Stop({
-                        offset: String(
-                            chartType === 'curve' ?
-                            1 - curveHeight / viewHeight :
-                            0
-                        ),
+                        offset: String(0),
                         stopColor: stops[0][0],
                         stopOpacity: 1
                     }),
@@ -140,11 +136,7 @@ module.exports = connect(
                         y2: viewHeight
                     },
                     Stop({
-                        offset: String(
-                            chartType === 'curve' ?
-                            1 - curveHeight / viewHeight :
-                            0
-                        ),
+                        offset: String(0),
                         stopColor: stops[1][0],
                         stopOpacity: 1
                     }),

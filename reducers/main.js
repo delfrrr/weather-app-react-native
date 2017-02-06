@@ -450,14 +450,23 @@ module.exports.setHourRange = function (selectedBars) {
 }
 
 module.exports.setHourlyMinMax = function () {
-    let {hourly, useApparentTemperature} = this.getState();
+    let {hourly, useApparentTemperature, chartType} = this.getState();
     let tAr = hourly.reduce((tAr, dataBlock) => {
         if (dataBlock) {
-            tAr.push(...dataBlock.data.map((dataPoint) => {
-                return useApparentTemperature ?
-                    dataPoint.apparentTemperature :
-                    dataPoint.temperature;
-            }));
+            if (chartType === 'bars') {
+                tAr.push(...dataBlock.data.map((dataPoint) => {
+                    return useApparentTemperature ?
+                        dataPoint.apparentTemperature :
+                        dataPoint.temperature;
+                }));
+            } else {
+                //max min from both temperature and apparentTemperature
+                tAr.push(...dataBlock.data.map(
+                    dataPoint => dataPoint.apparentTemperature
+                ), ...dataBlock.data.map(
+                    dataPoint => dataPoint.temperature
+                ));
+            }
         }
         return tAr;
     }, []);

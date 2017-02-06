@@ -48,44 +48,6 @@ function sliceDataPoints(hourly, date, timezone) {
 }
 
 /**
- * marks outliers
- * @param  {{temperature: Number, key: Number}} temperaturePointAr
- * @return {{temperature: Number, key: Number, outlier: Boolean}} temperaturePointAr
- */
-/*function markOutliars(temperaturePointAr) {
-    let tAr = temperaturePointAr.map(p => p.temperature);
-    let range = Math.max(...tAr) - Math.min(...tAr);
-    let closestNeigbours = tAr.map((t, k) => {
-        let prev = tAr[k - 1];
-        let next = tAr[k + 1];
-        if (typeof prev !== 'number') {
-            prev = next;
-        } else if (typeof next !== 'number') {
-            next = prev;
-        }
-        return {
-            minDt: Math.min(
-                Math.abs(t - prev),
-                Math.abs(t - next)
-            ) / range,
-            extrem: (t > prev && t > next) || (t < prev && t < next)
-        };
-    });
-    temperaturePointAr.forEach((tp, k) => {
-        let {minDt, extrem} = closestNeigbours[k];
-        if (
-            minDt > 0.3 &&
-            extrem &&
-            k > 0 &&
-            k < temperaturePointAr.length - 1
-        ) {
-            tp.outlier = true;
-        }
-    });
-    return temperaturePointAr;
-}*/
-
-/**
  * @param  {Object} props
  * @return {Object} state
  */
@@ -107,12 +69,14 @@ function getSateFromProps(props) {
     if (dataPoints.length === 24) {
         let temperaturePointAr = dataPoints.map((dp, key) => {
             return {
-                temperature: useApparentTemperature ?
+                tLine: dp.temperature,
+                tArea: useApparentTemperature ?
                     dp.apparentTemperature :
                     dp.temperature,
                 key
             }
         });
+        //TODO: not cool
         if (minTemperture > 100) {
             minTemperture = -273;
         }
@@ -157,6 +121,7 @@ module.exports = connect(
         if (!temperaturePointAr) {
             return null;
         }
+        console.log(temperaturePointAr);
         const {width, height} = Dimensions.get('window');
         const svgSize = {
             width: width / 2,
@@ -168,12 +133,12 @@ module.exports = connect(
         let yScale = scaleLinear()
             .domain([minTemperture, maxTemperture])
             .range([svgSize.height - 20, 5]);
-        let curve = line()
-            .y(p => yScale(p.temperature))
+        let lineFun = line()
+            .y(p => yScale(p.tLine))
             .x(p => xScale(p.key))
             .curve(curveMonotoneX);
-        let areaCurve = area()
-            .y(p => yScale(p.temperature))
+        let areaFun = area()
+            .y(p => yScale(p.tArea))
             .x(p => xScale(p.key))
             .y1(svgSize.height)
             .curve(curveMonotoneX);
@@ -181,8 +146,8 @@ module.exports = connect(
             // .y0(yScale(minTemperture))
             // .x1(xScale(temperaturePointAr.length - 1))
             // .y1(yScale(maxTemperture))
-        let dArea = areaCurve(temperaturePointAr.filter(tp => !tp.outlier));
-        let dCurve = curve(temperaturePointAr.filter(tp => !tp.outlier));
+        let areaStr = areaFun(temperaturePointAr);
+        let lineStr = lineFun(temperaturePointAr);
         // let d = curve(temperaturePointAr);
         return view(
             {
@@ -212,43 +177,43 @@ module.exports = connect(
                         stop({
                             offset: String(0),
                             stopColor: 'white',
-                            stopOpacity: .1
+                            stopOpacity: .2
                         }),
                         stop({
                             offset: String(.7),
                             stopColor: 'white',
-                            stopOpacity: 0
+                            stopOpacity: .1
                         })
                     )
                 ),
                 path({
-                    d: dArea,
+                    d: areaStr,
                     strokeWidth: 0,
                     fill: 'url(#grad)'
                 }),
                 path({
-                    d: dCurve,
+                    d: lineStr,
                     stroke: 'rgba(255, 255, 255, 1)',
                     strokeWidth: 1,
                     fill: 'transparent'
-                }),
-                g(
-                    {},
-                    temperaturePointAr.map((p, key) => {
-                        if (!p.outlier) {
-                            return null;
-                        }
-                        return circle({
-                            key,
-                            r: 3,
-                            cx: xScale(key),
-                            cy: yScale(p.temperature),
-                            fill: p.outlier ? 'red' : 'transparent',
-                            strokeWidth: .5,
-                            stroke: 'white'
-                        })
-                    })
-                )
+                })//,
+                // g(
+                //     {},
+                //     temperaturePointAr.map((p, key) => {
+                //         if (!p.outlier) {
+                //             return null;
+                //         }
+                //         return circle({
+                //             key,
+                //             r: 3,
+                //             cx: xScale(key),
+                //             cy: yScale(p.temperature),
+                //             fill: p.outlier ? 'red' : 'transparent',
+                //             strokeWidth: .5,
+                //             stroke: 'white'
+                //         })
+                //     })
+                // )
             )
         );
     }

@@ -6,16 +6,20 @@
 'use strict';
 
 const React = require('react');
-const {Dimensions} = require('react-native');
+// const {Dimensions} = require('react-native');
+const {width, curveHeight} = require('../lib/getDimensions')();
 const view = React.createFactory(require('react-native').View);
 const connect = require('react-redux').connect;
 // const text = React.createFactory(require('./text'));
 const svg = React.createFactory(require('react-native-svg').Svg);
 const getDataPoints = require('../lib/getDataPoints');
 const moment = require('moment');
-const {line, curveMonotoneX, area} = require('d3-shape');
+const {line, curveMonotoneX/*, area*/} = require('d3-shape');
+// const temperatureColor = require('../lib/temperature-color');
+const formatTemperature = require('../lib/format-temperature');
 let path = React.createFactory(require('react-native-svg').Path);
 let g = React.createFactory(require('react-native-svg').G);
+let svgText = React.createFactory(require('react-native-svg').Text);
 let linearGradient = React.createFactory(
     require('react-native-svg').LinearGradient
 );
@@ -47,6 +51,31 @@ function sliceDataPoints(hourly, date, timezone) {
     });
 }
 
+function getLocalMinMax(tempAr) {
+    let localMax = Math.max(...tempAr);
+    let localMin = Math.min(...tempAr);
+    return {localMax, localMin};
+}
+
+function addSpecialPoints(temperaturePointAr) {
+    const padding = 15; //px
+    const offset = Math.ceil(padding / (width / 2 / 24));
+    let {localMin, localMax} = getLocalMinMax(
+        temperaturePointAr.map(p => p.t).slice(offset, 23 - offset)
+    );
+    temperaturePointAr.forEach(p => {
+        if (p.t === localMax) {
+            p.localMax = true;
+            localMax = null;
+        }
+        if (p.t === localMin) {
+            p.localMin = true;
+            localMin = null;
+        }
+    })
+    return temperaturePointAr;
+}
+
 /**
  * @param  {Object} props
  * @return {Object} state
@@ -57,7 +86,6 @@ function getSateFromProps(props) {
         minTemperture,
         maxTemperture,
         timezones,
-        useApparentTemperature,
         hourly,
         dates
     } = props;
@@ -67,15 +95,13 @@ function getSateFromProps(props) {
         timezones[index]
     );
     if (dataPoints.length === 24) {
-        let temperaturePointAr = dataPoints.map((dp, key) => {
+        let temperaturePointAr = addSpecialPoints(dataPoints.map((dp, key) => {
             return {
-                tLine: dp.temperature,
-                tArea: useApparentTemperature ?
-                    dp.apparentTemperature :
-                    dp.temperature,
+                t: dp.temperature,
+                at: dp.apparentTemperature,
                 key
             }
-        });
+        }));
         //TODO: not cool
         if (minTemperture > 100) {
             minTemperture = -273;
@@ -118,36 +144,49 @@ module.exports = connect(
     },
     render: function () {
         const {minTemperture, maxTemperture, temperaturePointAr} = this.state;
+        const {temperatureFormat, useApparentTemperature} = this.props;
         if (!temperaturePointAr) {
             return null;
         }
-        console.log(temperaturePointAr);
-        const {width, height} = Dimensions.get('window');
+        // const {localMin, localMax} = getLocalMinMax(
+        //     temperaturePointAr.map(p => p.t).concat(
+        //         temperaturePointAr.map(p => p.at)
+        //     )
+        // );
         const svgSize = {
             width: width / 2,
-            height: height * 0.4
+            height: curveHeight
         };
         let xScale = scaleLinear()
             .domain([0, temperaturePointAr.length - 1])
             .range([0, svgSize.width]);
         let yScale = scaleLinear()
             .domain([minTemperture, maxTemperture])
-            .range([svgSize.height - 20, 5]);
-        let lineFun = line()
-            .y(p => yScale(p.tLine))
+            .range([svgSize.height - 20, 50]);
+        let tempLine = line()
+            .y(p => yScale(p.t))
             .x(p => xScale(p.key))
             .curve(curveMonotoneX);
-        let areaFun = area()
-            .y(p => yScale(p.tArea))
-            .x(p => xScale(p.key))
-            .y1(svgSize.height)
-            .curve(curveMonotoneX);
+        let tempLineStr = tempLine(temperaturePointAr);
+        let aTempLine;
+        let aTempLineStr;
+        if (useApparentTemperature) {
+            aTempLine = line()
+                .y(p => yScale(p.at))
+                .x(p => xScale(p.key))
+                .curve(curveMonotoneX);
+            aTempLineStr = aTempLine(temperaturePointAr);
+        }
+        // let areaFun = area()
+        //     .y(p => yScale(p.at))
+        //     .x(p => xScale(p.key))
+        //     .y1(svgSize.height)
+        //     .curve(curveMonotoneX);
             // .x0(xScale(0))
             // .y0(yScale(minTemperture))
             // .x1(xScale(temperaturePointAr.length - 1))
             // .y1(yScale(maxTemperture))
-        let areaStr = areaFun(temperaturePointAr);
-        let lineStr = lineFun(temperaturePointAr);
+        // let areaStr = areaFun(temperaturePointAr);
         // let d = curve(temperaturePointAr);
         return view(
             {
@@ -186,34 +225,57 @@ module.exports = connect(
                         })
                     )
                 ),
-                path({
-                    d: areaStr,
-                    strokeWidth: 0,
-                    fill: 'url(#grad)'
+                // path({
+                //     d: areaStr,
+                //     strokeWidth: 0,
+                //     fill: 'url(#grad)'
+                // }),
+                aTempLineStr && path({
+                    d: aTempLineStr,
+                    stroke: 'rgba(255, 255, 255, 0.2)',
+                    strokeWidth: .5,
+                    fill: 'transparent'
                 }),
                 path({
-                    d: lineStr,
+                    d: tempLineStr,
                     stroke: 'rgba(255, 255, 255, 1)',
                     strokeWidth: 1,
                     fill: 'transparent'
-                })//,
-                // g(
-                //     {},
-                //     temperaturePointAr.map((p, key) => {
-                //         if (!p.outlier) {
-                //             return null;
-                //         }
-                //         return circle({
-                //             key,
-                //             r: 3,
-                //             cx: xScale(key),
-                //             cy: yScale(p.temperature),
-                //             fill: p.outlier ? 'red' : 'transparent',
-                //             strokeWidth: .5,
-                //             stroke: 'white'
-                //         })
-                //     })
-                // )
+                }),
+                g(
+                    {},
+                    temperaturePointAr.map((p, key) => {
+                        if (p.localMin || p.localMax) {
+                            return g(
+                                {key},
+                                circle({
+                                    key,
+                                    r: 3,
+                                    cx: xScale(key),
+                                    cy: yScale(p.t),
+                                    fill: 'white',
+                                    strokeWidth: 6,
+                                    stroke: 'rgba(255, 255, 255, .2)'
+                                }),
+                                svgText(
+                                    {
+                                        x: xScale(key),
+                                        y: yScale(p.t) + (
+                                            p.localMin ? 10 : -24
+                                        ),
+                                        fontSize: 12,
+                                        fill: 'white',
+                                        textAnchor: 'middle'
+                                    },
+                                    formatTemperature(
+                                        p.t, temperatureFormat, '  '
+                                    )
+                                )
+                            );
+                        }
+                        return null;
+                    })
+                )
             )
         );
     }

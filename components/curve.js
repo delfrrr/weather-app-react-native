@@ -6,29 +6,17 @@
 'use strict';
 
 const React = require('react');
-// const {Dimensions} = require('react-native');
 const {width, curveHeight} = require('../lib/getDimensions')();
 const view = React.createFactory(require('react-native').View);
 const connect = require('react-redux').connect;
-// const text = React.createFactory(require('./text'));
 const svg = React.createFactory(require('react-native-svg').Svg);
 const getDataPoints = require('../lib/getDataPoints');
 const moment = require('moment');
-const {line, curveMonotoneX/*, area*/} = require('d3-shape');
-// const temperatureColor = require('../lib/temperature-color');
+const {line, curveMonotoneX, area} = require('d3-shape');
 const formatTemperature = require('../lib/format-temperature');
 let path = React.createFactory(require('react-native-svg').Path);
 let g = React.createFactory(require('react-native-svg').G);
 let svgText = React.createFactory(require('react-native-svg').Text);
-let linearGradient = React.createFactory(
-    require('react-native-svg').LinearGradient
-);
-let defs = React.createFactory(
-    require('react-native-svg').Defs
-);
-let stop = React.createFactory(
-    require('react-native-svg').Stop
-);
 let circle = React.createFactory(require('react-native-svg').Circle);
 let {scaleLinear} = require('d3-scale');
 
@@ -51,19 +39,27 @@ function sliceDataPoints(hourly, date, timezone) {
     });
 }
 
+/**
+ * @param  {number[]} tempAr
+ * @return {{localMax: Number, localMin: Number}}
+ */
 function getLocalMinMax(tempAr) {
     let localMax = Math.max(...tempAr);
     let localMin = Math.min(...tempAr);
     return {localMax, localMin};
 }
 
+/**
+ * @param {Object[]} temperaturePointAr
+ * @returns {Object[]} temperaturePointAr
+ */
 function addSpecialPoints(temperaturePointAr) {
     const padding = 15; //px
     const offset = Math.ceil(padding / (width / 2 / 24));
     let {localMin, localMax} = getLocalMinMax(
         temperaturePointAr.map(p => p.t).slice(offset, 23 - offset)
     );
-    temperaturePointAr.forEach(p => {
+    temperaturePointAr.slice(offset, 23 - offset).forEach(p => {
         if (p.t === localMax) {
             p.localMax = true;
             localMax = null;
@@ -71,6 +67,24 @@ function addSpecialPoints(temperaturePointAr) {
         if (p.t === localMin) {
             p.localMin = true;
             localMin = null;
+        }
+    })
+    return temperaturePointAr;
+}
+
+/**
+ * @param {Object[]} temperaturePointAr
+ * @returns {Object[]} temperaturePointAr
+ */
+function markForecast(temperaturePointAr) {
+    let ts = Math.floor(Date.now() / 1000);
+    temperaturePointAr.forEach((p, k) => {
+        let prev = temperaturePointAr[k - 1];
+        if (p.time > ts) {
+            if (prev && !prev.forecast) {
+                prev.current = true;
+            }
+            p.forecast = true;
         }
     })
     return temperaturePointAr;
@@ -95,13 +109,14 @@ function getSateFromProps(props) {
         timezones[index]
     );
     if (dataPoints.length === 24) {
-        let temperaturePointAr = addSpecialPoints(dataPoints.map((dp, key) => {
+        let temperaturePointAr = markForecast(addSpecialPoints(dataPoints.map((dp, key) => {
             return {
                 t: dp.temperature,
                 at: dp.apparentTemperature,
-                key
+                key,
+                time: dp.time
             }
-        }));
+        })));
         //TODO: not cool
         if (minTemperture > 100) {
             minTemperture = -273;
@@ -162,38 +177,32 @@ module.exports = connect(
             .range([0, svgSize.width]);
         let yScale = scaleLinear()
             .domain([minTemperture, maxTemperture])
-            .range([svgSize.height - 20, 50]);
+            .range([svgSize.height - 40, 50]);
         let tempLine = line()
             .y(p => yScale(p.t))
             .x(p => xScale(p.key))
             .curve(curveMonotoneX);
-        let tempLineStr = tempLine(temperaturePointAr);
-        let aTempLine;
-        let aTempLineStr;
+        let tempLineStr = tempLine(temperaturePointAr.filter(p => {
+            return !p.forecast
+        }));
+        let forecastTempLineStr = tempLine(temperaturePointAr.filter(p => {
+            return p.forecast;
+        }));
+        let aTempArea;
+        let aTempAreaStr;
         if (useApparentTemperature) {
-            aTempLine = line()
-                .y(p => yScale(p.at))
+            aTempArea = area()
+                .y0(p => yScale(p.t))
+                .y1(p => yScale(p.at))
                 .x(p => xScale(p.key))
                 .curve(curveMonotoneX);
-            aTempLineStr = aTempLine(temperaturePointAr);
+            aTempAreaStr = aTempArea(temperaturePointAr);
         }
-        // let areaFun = area()
-        //     .y(p => yScale(p.at))
-        //     .x(p => xScale(p.key))
-        //     .y1(svgSize.height)
-        //     .curve(curveMonotoneX);
-            // .x0(xScale(0))
-            // .y0(yScale(minTemperture))
-            // .x1(xScale(temperaturePointAr.length - 1))
-            // .y1(yScale(maxTemperture))
-        // let areaStr = areaFun(temperaturePointAr);
-        // let d = curve(temperaturePointAr);
         return view(
             {
                 style: {
                     flex: 2,
                     justifyContent: 'flex-end'
-                    // backgroundColor: 'gold'
                 }
             },
             svg(
@@ -204,40 +213,20 @@ module.exports = connect(
                         // backgroundColor: 'blue'
                     }
                 },
-                defs(null,
-                    linearGradient(
-                        {
-                            id: 'grad',
-                            x1: 0,
-                            y1: 0,
-                            x2: 0,
-                            y2: svgSize.height
-                        },
-                        stop({
-                            offset: String(0),
-                            stopColor: 'white',
-                            stopOpacity: .2
-                        }),
-                        stop({
-                            offset: String(.7),
-                            stopColor: 'white',
-                            stopOpacity: .1
-                        })
-                    )
-                ),
-                // path({
-                //     d: areaStr,
-                //     strokeWidth: 0,
-                //     fill: 'url(#grad)'
-                // }),
-                aTempLineStr && path({
-                    d: aTempLineStr,
-                    stroke: 'rgba(255, 255, 255, 0.2)',
-                    strokeWidth: .5,
+                aTempAreaStr && path({
+                    d: aTempAreaStr,
+                    strokeWidth: 0,
+                    fill: 'rgba(255, 255, 255, 0.15)'
+                }),
+                tempLineStr && path({
+                    d: tempLineStr,
+                    stroke: 'rgba(255, 255, 255, 1)',
+                    strokeWidth: 1,
                     fill: 'transparent'
                 }),
-                path({
-                    d: tempLineStr,
+                forecastTempLineStr && path({
+                    d: forecastTempLineStr,
+                    strokeDasharray: [5, 3],
                     stroke: 'rgba(255, 255, 255, 1)',
                     strokeWidth: 1,
                     fill: 'transparent'

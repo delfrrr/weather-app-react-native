@@ -40,18 +40,6 @@ function sliceDataPoints(hourly, startHour, date, timezone) {
     });
 }
 
-/**
- * @param {number} startHour
- * @returns {string}
- */
-function formatHourTitle(startHour) {
-    let title = String(startHour + 3);
-    if (['3', '21'].indexOf(title) >= 0) {
-        title += 'h'
-    }
-    return title;
-}
-
 function getBarIndex(startHour) {
     return startHour / (24 / 4);
 }
@@ -220,27 +208,6 @@ module.exports = connect(
                                 }
                             },
                             temperatureStr
-                        )
-                    ),
-                    View(
-                        {
-                            style: {
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                bottom: 5,
-                                height: 15
-                            }
-                        },
-                        text(
-                            {
-                                style: {
-                                    textAlign: 'center',
-                                    height: 15,
-                                    fontSize: 10
-                                }
-                            },
-                            formatHourTitle(startHour)
                         )
                     )
                 )

@@ -460,10 +460,8 @@ module.exports.setHourlyMinMax = function () {
                         dataPoint.temperature;
                 }));
             } else {
-                //max min from both temperature and apparentTemperature
+                //only temperature
                 tAr.push(...dataBlock.data.map(
-                    dataPoint => dataPoint.apparentTemperature
-                ), ...dataBlock.data.map(
                     dataPoint => dataPoint.temperature
                 ));
             }

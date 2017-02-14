@@ -91,7 +91,6 @@ function getSateFromProps(props) {
     );
     if (dataPoints.length === 24) {
         let temperaturePointAr = markForecast(addSpecialPoints(dataPoints.map((dp, key) => {
-            console.log(dataPoints);
             return {
                 t: dp.temperature,
                 at: dp.apparentTemperature,

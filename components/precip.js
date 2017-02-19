@@ -8,7 +8,6 @@
 const React = require('react');
 const {width} = require('../lib/getDimensions')();
 const connect = require('react-redux').connect;
-// let path = React.createFactory(require('react-native-svg').Path);
 const sliceDataPoints = require('../lib/sliceDataPoints');
 const g = React.createFactory(require('react-native-svg').G);
 const svgText = React.createFactory(require('react-native-svg').Text);
@@ -85,20 +84,22 @@ module.exports = connect(
             {},
             precips.map(precip => {
                 let x = xScale(precip.key);
-                let y = 0;
+                let y0 = 6;
                 let symbols = [];
+                const step = 7;
                 if (precip.intensity) {
                     for (
                         let i = 0;
                         i < level(precip.probability);
                         i++
                     ) {
+                        let y = y0 + i * step;
                         if (precip.rain) {
                             symbols.push(circle({
                                 key: precip.key + i,
                                 r: radius(precip.intensity),
                                 cx: x,
-                                cy: y + i * 7 + 2.75 ,
+                                cy: y,
                                 fill: 'white'
                             }));
                         } else if (precip.snow) {
@@ -106,12 +107,11 @@ module.exports = connect(
                                 {
                                     key: precip.key + i,
                                     x: x,
-                                    y: y - 5 + i * 7,
+                                    y: y - 7.75,//adjust to center
                                     fontSize: 18,
                                     fontWeight: fontWeight(precip.intensity),
                                     fill: 'white',
-                                    textAnchor: 'middle',
-                                    backgroundColor: 'yellow'
+                                    textAnchor: 'middle'
                                 },
                                 '*'
                             ));

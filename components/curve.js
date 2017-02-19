@@ -14,6 +14,7 @@ const sliceDataPoints = require('../lib/sliceDataPoints');
 const {line, curveMonotoneX, area} = require('d3-shape');
 const formatTemperature = require('../lib/format-temperature');
 let precip = React.createFactory(require('./precip'));
+let windDetailed = React.createFactory(require('./windDetailed'));
 let path = React.createFactory(require('react-native-svg').Path);
 let g = React.createFactory(require('react-native-svg').G);
 let svgText = React.createFactory(require('react-native-svg').Text);
@@ -189,6 +190,7 @@ module.exports = connect(
                     }
                 },
                 precip({index}),
+                windDetailed({index}),
                 aTempAreaStr && path({
                     d: aTempAreaStr,
                     strokeWidth: 0,

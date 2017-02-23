@@ -14,6 +14,7 @@ const sliceDataPoints = require('../lib/sliceDataPoints');
 const {line, curveMonotoneX, area} = require('d3-shape');
 const formatTemperature = require('../lib/format-temperature');
 let precip = React.createFactory(require('./precip'));
+let overcast = React.createFactory(require('./overcast'));
 let windDetailed = React.createFactory(require('./windDetailed'));
 let path = React.createFactory(require('react-native-svg').Path);
 let g = React.createFactory(require('react-native-svg').G);
@@ -181,67 +182,81 @@ module.exports = connect(
                     justifyContent: 'flex-end'
                 }
             },
-            svg(
+            view(
                 {
-                    width: svgSize.width,
-                    height: svgSize.height,
                     style: {
-                        // backgroundColor: 'blue'
+                        width: svgSize.width,
+                        height: svgSize.height
                     }
                 },
-                precip({index}),
-                windDetailed({index}),
-                aTempAreaStr && path({
-                    d: aTempAreaStr,
-                    strokeWidth: 0,
-                    fill: 'rgba(255, 255, 255, 0.10)'
-                }),
-                tempLineStr && path({
-                    d: tempLineStr,
-                    stroke: 'rgba(255, 255, 255, 1)',
-                    strokeWidth: 1,
-                    fill: 'transparent'
-                }),
-                forecastTempLineStr && path({
-                    d: forecastTempLineStr,
-                    strokeDasharray: [8, 2],
-                    stroke: 'rgba(255, 255, 255, 1)',
-                    strokeWidth: 1,
-                    fill: 'transparent'
-                }),
-                g(
-                    {},
-                    temperaturePointAr.map((p, key) => {
-                        if (p.localMin || p.localMax) {
-                            return g(
-                                {key},
-                                circle({
-                                    key,
-                                    r: 3,
-                                    cx: xScale(key),
-                                    cy: yScale(Math.round(p.t)),
-                                    fill: 'white',
-                                    strokeWidth: 6,
-                                    stroke: 'rgba(255, 255, 255, .2)'
-                                }),
-                                svgText(
-                                    {
-                                        x: xScale(key),
-                                        y: yScale(p.t) + (
-                                            p.localMin ? 10 : -24
-                                        ),
-                                        fontSize: 12,
-                                        fill: 'white',
-                                        textAnchor: 'middle'
-                                    },
-                                    formatTemperature(
-                                        p.t, temperatureFormat, '  '
-                                    )
-                                )
-                            );
+                overcast({index}),
+                svg(
+                    {
+                        width: svgSize.width,
+                        height: svgSize.height,
+                        style: {
+                            // backgroundColor: 'blue'
                         }
-                        return null;
-                    })
+                    },
+                    g(
+                        {
+                            y: 25
+                        },
+                        precip({index}),
+                        windDetailed({index})
+                    ),
+                    aTempAreaStr && path({
+                        d: aTempAreaStr,
+                        strokeWidth: 0,
+                        fill: 'rgba(255, 255, 255, 0.10)'
+                    }),
+                    tempLineStr && path({
+                        d: tempLineStr,
+                        stroke: 'rgba(255, 255, 255, 1)',
+                        strokeWidth: 1,
+                        fill: 'transparent'
+                    }),
+                    forecastTempLineStr && path({
+                        d: forecastTempLineStr,
+                        strokeDasharray: [8, 2],
+                        stroke: 'rgba(255, 255, 255, 1)',
+                        strokeWidth: 1,
+                        fill: 'transparent'
+                    }),
+                    g(
+                        {},
+                        temperaturePointAr.map((p, key) => {
+                            if (p.localMin || p.localMax) {
+                                return g(
+                                    {key},
+                                    circle({
+                                        key,
+                                        r: 3,
+                                        cx: xScale(key),
+                                        cy: yScale(Math.round(p.t)),
+                                        fill: 'white',
+                                        strokeWidth: 6,
+                                        stroke: 'rgba(255, 255, 255, .2)'
+                                    }),
+                                    svgText(
+                                        {
+                                            x: xScale(key),
+                                            y: yScale(p.t) + (
+                                                p.localMin ? 10 : -24
+                                            ),
+                                            fontSize: 12,
+                                            fill: 'white',
+                                            textAnchor: 'middle'
+                                        },
+                                        formatTemperature(
+                                            p.t, temperatureFormat, '  '
+                                        )
+                                    )
+                                );
+                            }
+                            return null;
+                        })
+                    )
                 )
             )
         );

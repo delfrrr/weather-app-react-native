@@ -21,6 +21,7 @@ const menuIcon = React.createFactory(require('./components/menuIcon'));
 const locationIcon = React.createFactory(require('./components/locationIcon'));
 const reload = React.createFactory(require('./components/reload'));
 const citySelect = React.createFactory(require('./components/city-select'));
+const details = React.createFactory(require('./components/details'));
 const options = React.createFactory(require('./components/options'));
 const styles = StyleSheet.create({
     header: {
@@ -244,7 +245,8 @@ let zowninative = React.createClass({
                                         )
                                     })
                                 )
-                            )
+                            ),
+                            details()
                         )
                     ),
                     options({

@@ -4,11 +4,15 @@
 
 const React = require('react');
 const view = React.createFactory(require('react-native').View);
-const text = React.createFactory(require('./text'));
+const touchableOpacity = React.createFactory(
+    require('react-native').TouchableOpacity
+);
+const hourScale = React.createFactory(require('./hourScale'));
 const date = React.createFactory(require('./date'));
 const curve = React.createFactory(require('./curve'));
 const connect = require('react-redux').connect;
 const {Dimensions} = require('react-native');
+const store = require('../reducers/main');
 const tBar = React.createFactory(require('./t-bar'));
 const _ = require('lodash');
 
@@ -47,12 +51,13 @@ module.exports = connect(
             ),
             chartType === 'curve' ?
             curve({index}) :
-            view(
+            touchableOpacity(
                 {
                     style: {
                         flex: 1.5,
                         flexDirection: 'row'
-                    }
+                    },
+                    onPress: () => store.opensDetails(index)
                 },
                 _.times(4).map((key) => {
                     return tBar({
@@ -63,37 +68,7 @@ module.exports = connect(
                     });
                 })
             ),
-            view(
-                {
-                    style: {
-                        position: 'absolute',
-                        bottom: 5,
-                        left: 0,
-                        right: 0,
-                        height: 15,
-                        flexDirection: 'row'
-                    }
-                },
-                [3, 9, 15, 21].map((h, key, arr) => {
-                    let sufix = '';
-                    if (key === 0 || key === arr.length - 1 ) {
-                        sufix = 'h';
-                    }
-                    return text(
-                        {
-                            key,
-                            style: {
-                                flex: 1,
-                                textAlign: 'center',
-                                height: 15,
-                                lineHeight: 15,
-                                fontSize: 10
-                            }
-                        },
-                        h + sufix
-                    );
-                })
-            )
+            hourScale({hours: [3, 9, 15, 21]})
         );
     }
 }));

@@ -21,10 +21,15 @@ const Rect = React.createFactory(require('react-native-svg').Rect);
  * @param {ForecastDataBlock[]} hourly
  * @param {number[]} hourRange
  * @param {boolean} useApparentTemperature
+ * @param {number|null} index when need to show only one column
  * @returns {string[][]} colors
  */
-function getStops(hourly, hourRange, useApparentTemperature) {
-    return hourly.map((dataBlock) => {
+function getStops(hourly, hourRange, useApparentTemperature, index) {
+    let dataBlocks = hourly;
+    if (typeof index === 'number') {
+        dataBlocks = [hourly[index]];
+    }
+    let stops = dataBlocks.map((dataBlock) => {
         const points = getDataPoints(dataBlock);
         if (points) {
             let targetTempAr = points.map(
@@ -47,6 +52,10 @@ function getStops(hourly, hourRange, useApparentTemperature) {
             ];
         }
     });
+    if (stops.length < 2) {
+        stops[1] = stops[0];
+    }
+    return stops;
 }
 
 module.exports = connect(
@@ -60,9 +69,9 @@ module.exports = connect(
     }
 )(React.createClass({
     getInitialState() {
-        const {hourly, hourRange, useApparentTemperature} = this.props;
+        const {hourly, hourRange, useApparentTemperature, index} = this.props;
         return {
-            stops: getStops(hourly, hourRange, useApparentTemperature)
+            stops: getStops(hourly, hourRange, useApparentTemperature, index)
         };
     },
     componentWillReceiveProps(props) {
@@ -71,9 +80,11 @@ module.exports = connect(
             hourRange,
             useApparentTemperature
         } = props;
+        const index = this.props.index;
+        let stops = getStops(hourly, hourRange, useApparentTemperature, index);
         const interpolator = interpolate(
             this.state,
-            {stops: getStops(hourly, hourRange, useApparentTemperature)}
+            {stops}
         );
         const start = Date.now();
         const duration = 500;

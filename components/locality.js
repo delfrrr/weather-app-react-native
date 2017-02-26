@@ -5,9 +5,6 @@
 const React = require('react');
 const text = React.createFactory(require('./text'));
 const connect = require('react-redux').connect;
-// const touchableOpacity = React.createFactory(
-//     require('react-native').TouchableOpacity
-// );
 const view = React.createFactory(
     require('react-native').View
 );
@@ -42,12 +39,20 @@ module.exports = connect(
     }
 )(React.createClass({
     render: function () {
-        const {selectedLoacalities} = this.props;
+        const {selectedLoacalities, index} = this.props;
         if (!selectedLoacalities.length) {
             return null;
         }
-        const label1 = getLabel(selectedLoacalities[0]);
-        const label2 = getLabel(selectedLoacalities[1]);
+        let label1;
+        let label2;
+        if (typeof index === 'number') {
+            label1 = getLabel(
+                selectedLoacalities[index] || selectedLoacalities[0]
+            );
+        } else {
+            label1 = getLabel(selectedLoacalities[0]);
+            label2 = getLabel(selectedLoacalities[1]);
+        }
         const maxLength = Math.max(...label1.split(' ').concat(
             label2 ? label2.split(' ') : []
         ).map(l => l.length));
@@ -56,10 +61,7 @@ module.exports = connect(
                 style: {
                     flex: 1,
                     justifyContent: 'center'
-                }//,
-                // onPress: () => {
-                //     // store.toggleCitySelect();
-                // }
+                }
             },
             label2 ?
             view(

@@ -151,6 +151,16 @@ module.exports = store = redux.createStore(redux.combineReducers({
                 return selectedBars;
         }
     },
+    details: function (details = null, action) {
+        switch (action.type) {
+            case actionTypes.OPEN_DETAILS:
+                return action.index;
+            case actionTypes.CLOSE_DETAILS:
+                return null;
+            default:
+                return details;
+        }
+    },
     hourRange: function (
         hourRange = defaultHourRange, action
     ) {
@@ -195,8 +205,7 @@ const propertiesToSave = [
     'selectedLoacalities',
     'temperatureFormat',
     'forecastApiRequests',
-    'useApparentTemperature',
-    'chartType'
+    'useApparentTemperature'
 ];
 const storageKey = 'reducers.main.store.state';
 function saveStore() {
@@ -226,6 +235,19 @@ module.exports.requestDateInput = function (index) {
 module.exports.closeDateInput = function () {
     this.dispatch({
         type: actionTypes.CLOSE_DATE_SELECT
+    })
+};
+
+module.exports.opensDetails = function (index) {
+    this.dispatch({
+        type: actionTypes.OPEN_DETAILS,
+        index
+    })
+};
+
+module.exports.closeDetails = function () {
+    this.dispatch({
+        type: actionTypes.CLOSE_DETAILS
     })
 };
 
@@ -611,8 +633,7 @@ module.exports.loadState = function () {
                 selectedLoacalities,
                 temperatureFormat,
                 forecastApiRequests,
-                useApparentTemperature,
-                chartType
+                useApparentTemperature
             } = state;
             if (typeof forecastApiRequests === 'number') {
                 this.dispatch({
@@ -639,9 +660,6 @@ module.exports.loadState = function () {
                 this.setSelectedLocalities(selectedLoacalities);
             } else {
                 this.setPosition();
-            }
-            if (chartType) {
-                this.setChartType(chartType);
             }
         } else {
             this.setPosition();

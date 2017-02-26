@@ -28,7 +28,9 @@ const actions = [
     'REMOVE_LOCALITY',
     'FORECAST_REQUEST',
     'SET_FORECAST_REQ',
-    'SET_CHART_FORMAT'
+    'SET_CHART_FORMAT',
+    'OPEN_DETAILS',
+    'CLOSE_DETAILS'
 ];
 
 /**

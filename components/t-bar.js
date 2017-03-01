@@ -7,8 +7,6 @@
 
 const React = require('react');
 const View = React.createFactory(require('react-native').View);
-const {LayoutAnimation} = require('react-native');
-// const TouchableWithoutFeedback = React.createFactory(require('react-native').TouchableWithoutFeedback);
 const text = React.createFactory(require('./text'));
 const rain = React.createFactory(require('./rain'));
 const wind = React.createFactory(require('./wind'));
@@ -124,15 +122,6 @@ module.exports = connect(
         return Object.assign({
             barHeight: 0
         }, getSateFromProps(this.props));
-    },
-    componentWillUpdate: function () {
-        const {details, citySelect} = this.props;
-        if ((details === null) && !citySelect) {
-            //do not animate when is not visible
-            LayoutAnimation.configureNext(
-                LayoutAnimation.create(400, 'linear', 'opacity')
-            );
-        }
     },
     componentWillReceiveProps: function (props) {
         this.setState(getSateFromProps(props));

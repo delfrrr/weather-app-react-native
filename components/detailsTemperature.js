@@ -13,11 +13,13 @@ const svg = React.createFactory(require('react-native-svg').Svg);
 const sliceDataPoints = require('../lib/sliceDataPoints');
 const {line, curveMonotoneX, curveBasis, area} = require('d3-shape');
 const formatTemperature = require('../lib/format-temperature');
-let path = React.createFactory(require('react-native-svg').Path);
-let g = React.createFactory(require('react-native-svg').G);
-let svgText = React.createFactory(require('react-native-svg').Text);
-let circle = React.createFactory(require('react-native-svg').Circle);
-let {scaleLinear} = require('d3-scale');
+const path = React.createFactory(require('react-native-svg').Path);
+const g = React.createFactory(require('react-native-svg').G);
+const svgText = React.createFactory(require('react-native-svg').Text);
+const circle = React.createFactory(require('react-native-svg').Circle);
+const {scaleLinear} = require('d3-scale');
+const view = React.createFactory(require('react-native').View);
+const {interpolate} = require('d3-interpolate');
 
 /**
  * @param  {number[]} tempAr
@@ -92,6 +94,18 @@ let bottomPadding = 22;
 let yScale = scaleLinear()
     .range([dTHeight - bottomPadding, topPadding]);
 
+let tAreaFn = area()
+    .y0(p => yScale(p.t))
+    .y1(() => dTHeight)
+    .x(p => xScale(p.hour))
+    .curve(curveMonotoneX);
+let atAreaFn = area()
+    .y0(p => yScale(p.at))
+    .y1(() => dTHeight)
+    .x(p => xScale(p.hour))
+    .curve(curveMonotoneX);
+
+
 /**
  * @param  {Object} props
  * @return {Object} state
@@ -114,6 +128,10 @@ function getSateFromProps(props) {
                 getPoints(dataPoints)
             )
         );
+        points.forEach((p) => {
+            p.at = Math.round(p.at);
+            p.r = Math.round(p.t);
+        });
         let tPoints = [].concat(
             points.map((p) => p.t),
             points.map((p) => p.at)
@@ -121,13 +139,12 @@ function getSateFromProps(props) {
         return {
             minTemperture: Math.min(...tPoints),
             maxTemperture: Math.max(...tPoints),
-            points
+            points,
+            valid: true
         };
     } else {
         return {
-            points: null,
-            minTemperture: null,
-            maxTemperture: null
+            valid: false
         };
     }
 }
@@ -179,116 +196,136 @@ module.exports = connect(
     }
 )(React.createClass({
     getInitialState: function () {
-        return getSateFromProps(this.props);
+        return Object.assign(
+            {
+                points: null,
+                minTemperture: null,
+                maxTemperture: null,
+                valid: false,
+                animationProgress: 1
+            },
+            getSateFromProps(this.props)
+        );
     },
     componentWillReceiveProps: function (props) {
-        this.setState(getSateFromProps(props));
+        const newState = getSateFromProps(props);
+        if (!newState.valid) {
+            this.setState(newState);
+            return;
+        }
+        const start = Date.now();
+        const duration = 500;
+        const interpolator = interpolate(
+            this.state,
+            newState
+        );
+        this._animation = () => {
+            const now = Date.now();
+            let t = (now - start) / duration;
+            if (t > 1) {
+                t = 1;
+            }
+            this.setState(Object.assign(
+                interpolator(t),
+                {animationProgress: t}
+            ));
+            if (t < 1) {
+                requestAnimationFrame(this._animation);
+            }
+        }
+        requestAnimationFrame(this._animation);
     },
     render: function () {
-        const {minTemperture, maxTemperture, points} = this.state;
+        const {
+            minTemperture,
+            maxTemperture,
+            points,
+            animationProgress,
+            valid
+        } = this.state;
         const {temperatureFormat/*, useApparentTemperature*/} = this.props;
         if (!points) {
             return null;
         }
         yScale.domain([minTemperture, maxTemperture]);
-        let tArea = area()
-            .y0(p => yScale(Math.round(p.t)))
-            .y1(() => dTHeight)
-            .x(p => xScale(p.hour))
-            .curve(curveMonotoneX)(
-                points
-            );
-        let atArea = area()
-            .y0(p => yScale(Math.round(p.at)))
-            .y1(() => dTHeight)
-            .x(p => xScale(p.hour))
-            .curve(curveMonotoneX)(
-                points
-            );
-        // let tempLine = line()
-        //     .y(p => yScale(Math.round(p.t)))
-        //     .x(p => xScale(p.key))
-        //     .curve(curveMonotoneX);
-        // let tempLineStr = tempLine(temperaturePointAr.filter(p => {
-        //     return !p.forecast
-        // }));
-        // let forecastTempLineStr = tempLine(temperaturePointAr.filter(p => {
-        //     return p.forecast;
-        // }));
-        // let aTempArea;
-        // let aTempAreaStr;
-        // if (useApparentTemperature) {
-        //     aTempArea = area()
-        //         .y0(p => yScale(Math.round(p.t)))
-        //         .y1(p => yScale(Math.round(p.at)))
-        //         .x(p => xScale(p.key))
-        //         .curve(curveMonotoneX);
-        //     aTempAreaStr = aTempArea(temperaturePointAr);
-        // }
-
+        let tArea = tAreaFn(points);
+        let atArea = atAreaFn(points);
         let labeledPoints = points.filter((p) => {
             return p.current || p.localMin || p.localMax;
         });
         let labelPoints = getLabelPoints(labeledPoints, xScale);
-        return svg(
+        return view(
             {
-                width,
-                height: dTHeight,
                 style: {
-                    // backgroundColor: 'pink'
+                    width,
+                    height: dTHeight
                 }
             },
-            path({
-                d: tArea,
-                strokeWidth: 0,
-                fill: 'rgba(255, 255, 255, .3)'
-            }),
-            path({
-                d: atArea,
-                strokeWidth: 0,
-                fill: 'rgba(255, 255, 255, .1)'
-            }),
-            labeledPoints.map((p, key) => {
-                let elems = []
-                let anchorP = [xScale(p.hour), yScale(Math.round(p.t))];
-                let labelP = [labelPoints[key], 32];
-                let anchorLine = labelsAnchorLineFn(
-                        [
-                            anchorP,
-                            [anchorP[0], anchorP[1] - 10],
-                            [labelP[0], labelP[1] + 10],
-                            labelP
-                        ]
-                    );
-                elems.push(path({
-                    d: anchorLine,
-                    stroke: 'white',
-                    strokeWidth: 1,
-                    fill: 'transparent',
-                    opacity: 0.3
-                }));
-                elems.push(circle({
-                    r: 3,
-                    cx: anchorP[0],
-                    cy: anchorP[1],
-                    fill: 'white',
-                    strokeWidth: p.current ? 6 : 0,
-                    stroke: 'rgba(255, 255, 255, .2)'
-                }))
-                elems.push(svgText(
-                    {
-                        x: labelP[0],
-                        y: 0,
-                        fontSize: 12,
+            svg(
+                {
+                    width,
+                    height: dTHeight,
+                    style: {position: 'absolute', top: 0}
+                },
+                path({
+                    d: tArea,
+                    strokeWidth: 0,
+                    fill: 'rgba(255, 255, 255, .3)'
+                }),
+                path({
+                    d: atArea,
+                    strokeWidth: 0,
+                    fill: 'rgba(255, 255, 255, .1)'
+                })
+            ),
+            (animationProgress === 1 && valid) ? svg(
+                {
+                    width,
+                    height: dTHeight,
+                    style: {position: 'absolute', top: 0}
+                },
+                labeledPoints.map((p, key) => {
+                    let elems = []
+                    let anchorP = [xScale(p.hour), yScale(Math.round(p.t))];
+                    let labelP = [labelPoints[key], 32];
+                    let anchorLine = labelsAnchorLineFn(
+                            [
+                                anchorP,
+                                [anchorP[0], anchorP[1] - 10],
+                                [labelP[0], labelP[1] + 10],
+                                labelP
+                            ]
+                        );
+                    elems.push(path({
+                        d: anchorLine,
+                        stroke: 'white',
+                        strokeWidth: 1,
+                        fill: 'transparent',
+                        opacity: 0.3
+                    }));
+                    elems.push(circle({
+                        r: 3,
+                        cx: anchorP[0],
+                        cy: anchorP[1],
                         fill: 'white',
-                        textAnchor: 'middle'
-                    },
-                    `${getLabelPrefix(p)}\n${formatTemperature(
-                        p.t, temperatureFormat, ' '
-                    )}`
-                ));
-                return g({key}, ...elems);
-            })
-        );
+                        strokeWidth: p.current ? 6 : 0,
+                        stroke: 'rgba(255, 255, 255, .2)'
+                    }))
+                    elems.push(svgText(
+                        {
+                            x: labelP[0],
+                            y: 0,
+                            fontSize: 12,
+                            fill: 'white',
+                            textAnchor: 'middle'
+                        },
+                        `${getLabelPrefix(p)}\n${formatTemperature(
+                            p.t, temperatureFormat, ' '
+                        )}`
+                    ));
+                    return g({key}, ...elems);
+                })
+            ) : null
+        )
     }
 }));

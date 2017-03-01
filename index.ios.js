@@ -3,7 +3,7 @@
  */
 
 const React = require('react');
-const {AppRegistry, StyleSheet} = require('react-native');
+const {AppRegistry, StyleSheet, LayoutAnimation} = require('react-native');
 const getDimensions = require('./lib/getDimensions');
 const scrollView = React.createFactory(require('react-native').ScrollView);
 const View = React.createFactory(require('react-native').View);
@@ -53,8 +53,16 @@ let zowninative = React.createClass({
             verticalScroll: 0
         };
     },
+
+    setAnimation: function () {
+        LayoutAnimation.configureNext(
+            LayoutAnimation.create(400, 'linear', 'opacity')
+        );
+    },
+
     componentWillMount: function () {
         store.loadState();
+        store.subscribe(this.setAnimation);
     },
     componentDidUpdate: function () {
         let {scrollEnabled} = this.state;

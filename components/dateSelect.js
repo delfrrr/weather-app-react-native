@@ -4,8 +4,6 @@
  */
 
 const React = require('react');
-const Animated = require('react-native').Animated;
-const AnimatedView = React.createFactory(Animated.View);
 const View = React.createFactory(require('react-native').View);
 const text = React.createFactory(require('./text'));
 const moment = require('moment-timezone');
@@ -25,7 +23,6 @@ DatePickerIOS.propTypes.timeZoneOffsetInHours = React.PropTypes.any;
 DatePickerIOS.propTypes.onDateChange = React.PropTypes.func;
 
 const datePicker = React.createFactory(DatePickerIOS);
-// const text = React.createFactory(require('./text'));
 const connect = require('react-redux').connect;
 const store = require('../reducers/main');
 
@@ -86,18 +83,13 @@ module.exports = connect(
 )(React.createClass({
     getInitialState: function () {
         return {
-            bottom: new Animated.Value(-HEIGHT),
+            bottom: -HEIGHT,
             datePicker: false
         }
     },
-    componentDidUpdate: function () {
-        Animated.timing(
-            this.state.bottom,
-            {
-                duration: 250,
-                toValue: this.props.show ? 0 : -HEIGHT
-            }
-        ).start();
+    componentWillReceiveProps: function (props) {
+        let {show} = props;
+        this.setState({bottom: show ? 0 : -HEIGHT});
     },
     moment: function (date) {
         date = date || new Date();
@@ -137,7 +129,7 @@ module.exports = connect(
             }
         }
         const tz = moment.tz.zone(timezone).offset(Date.now()) / 60;
-        return AnimatedView(
+        return View(
             {
                 style: {
                     position: 'absolute',

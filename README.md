@@ -7,13 +7,13 @@ The source code is published for knowledge sharing purposes.
 <table>
     <tr>
         <td><a href="https://www.youtube.com/watch?v=Z0eKfLKoo7w"><img src="http://i.giphy.com/Ow17HWlGTmtfG.gif" alt="Weather-App-React-Native"/></a></td>
-        <td><a title="iOS app for comparing weather forecast with historical data" href="http://zowni.com"><img src="http://i.imgur.com/IKRKgOL.png" alt="Get invite on Apple TestFlight"/></a></td>
+        <td><a title="iOS app for comparing weather forecast with historical data" href="https://zowni.com"><img src="http://i.imgur.com/IKRKgOL.png" alt="Get invite on Apple TestFlight"/></a></td>
     </tr>
 </table>
 
 
 * [Veiw full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
-* [Get invite on Apple TestFlight](http://zowni.com)
+* [Get invite on Apple TestFlight](https://zowni.com)
 
 
 # Used components
@@ -45,4 +45,4 @@ Check `package.json` for details
 * setup FacebookSDK as [described here](https://github.com/facebook/react-native-fbsdk)
 * type `$ ./node_modules/.bin/react-native link`
 
-Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just leave your email at http://zowni.com and get a link to download the app.
+Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just leave your email at https://zowni.com and get a link to download the app.

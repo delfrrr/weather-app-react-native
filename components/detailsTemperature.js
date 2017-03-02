@@ -53,24 +53,6 @@ function addSpecialPoints(temperaturePointAr) {
 }
 
 /**
- * @param {Object[]} temperaturePointAr
- * @returns {Object[]} temperaturePointAr
- */
-function markForecast(temperaturePointAr) {
-    let ts = Math.floor(Date.now() / 1000);
-    temperaturePointAr.forEach((p, k) => {
-        let prev = temperaturePointAr[k - 1];
-        if (p.time > ts) {
-            if (prev && !prev.forecast) {
-                prev.current = true;
-            }
-            p.forecast = true;
-        }
-    })
-    return temperaturePointAr;
-}
-
-/**
  * @param  {object[]} dataPoints
  * @return {object[]} with only needed values
  */
@@ -80,7 +62,8 @@ function getPoints(dataPoints) {
             t: dp.temperature,
             at: dp.apparentTemperature,
             hour,
-            time: dp.time
+            time: dp.time,
+            current: dp.current
         }
     })
 }
@@ -115,18 +98,18 @@ function getSateFromProps(props) {
         index,
         timezones,
         hourly,
-        dates
+        dates,
+        currently
     } = props;
     const dataPoints = sliceDataPoints(
         hourly[index],
         dates[index],
-        timezones[index]
+        timezones[index],
+        currently[index]
     );
     if (dataPoints.length === 24) {
-        let points = markForecast(
-            addSpecialPoints(
-                getPoints(dataPoints)
-            )
+        let points = addSpecialPoints(
+            getPoints(dataPoints)
         );
         points.forEach((p) => {
             p.at = Math.round(p.at);
@@ -190,7 +173,8 @@ module.exports = connect(
             hourly: state.hourly,
             timezones: state.timezones,
             dates: state.dates,
-            temperatureFormat: state.temperatureFormat//,
+            temperatureFormat: state.temperatureFormat,
+            currently: state.currently
             // useApparentTemperature: state.useApparentTemperature
         }
     }

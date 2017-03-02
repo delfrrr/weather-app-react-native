@@ -70,7 +70,7 @@ module.exports = connect(
             setToday: function () {
                 store.setDate(
                     this.props.show.index,
-                    this.moment().startOf('day').toDate()
+                    this.moment().toDate()
                 );
             },
             triggerCalendar: function () {

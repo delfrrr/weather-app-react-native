@@ -21,12 +21,13 @@ const _ = require('lodash');
 module.exports = connect(
     function mapStateToProps(state) {
         return {
-            chartType: state.chartType
+            chartType: state.chartType,
+            detailsShowed: typeof state.details === 'number'
         }
     }
 )(React.createClass({
     render: function () {
-        const {dateOpacity, index, chartType} = this.props;
+        const {dateOpacity, index, chartType, detailsShowed} = this.props;
         const {width} = Dimensions.get('window');
         const barWidth = Math.ceil(width / 8);
         return view(
@@ -51,7 +52,7 @@ module.exports = connect(
             ),
             chartType === 'curve' ?
             curve({index}) :
-            touchableOpacity(
+            detailsShowed ? null : touchableOpacity(
                 {
                     style: {
                         flex: 1.5,

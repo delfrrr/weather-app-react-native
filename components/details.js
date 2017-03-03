@@ -13,16 +13,28 @@ const touchableOpacity = React.createFactory(
 );
 const locality = React.createFactory(require('./locality'));
 const detailsTemperature = React.createFactory(require('./detailsTemperature'));
-// const detailsWind = React.createFactory(require('./detailsWind'));
+const detailsWind = React.createFactory(require('./detailsWind'));
 const hourScale = React.createFactory(require('./hourScale'));
 const connect = require('react-redux').connect;
 const store = require('../reducers/main');
 const background = React.createFactory(require('./background'));
+const sliceDataPoints = require('../lib/sliceDataPoints');
 
 module.exports = connect(
     function mapStateToProps(state) {
+        let index = state.details;
+        let dataPoints = [];
+        if (typeof index === 'number') {
+            dataPoints = sliceDataPoints(
+                state.hourly[index],
+                state.dates[index],
+                state.timezones[index],
+                state.currently[index]
+            );
+        }
         return {
-            index: state.details
+            index,
+            dataPoints
         };
     }
 )(React.createClass({
@@ -31,7 +43,8 @@ module.exports = connect(
     },
     render() {
         const {
-            index
+            index,
+            dataPoints
         } = this.props;
         if (index === null) {
             return null;
@@ -101,8 +114,8 @@ module.exports = connect(
                             justifyContent: 'flex-end'
                         }
                     },
-                    // detailsWind({index}),
-                    detailsTemperature({index})
+                    detailsWind({dataPoints}),
+                    detailsTemperature({dataPoints})
                 ),
                 hourScale({hours: [2, 6, 10, 14, 18, 22]})
             )

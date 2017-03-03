@@ -10,7 +10,6 @@ const {width} = require('../lib/getDimensions')();
 const dTHeight = 130;
 const connect = require('react-redux').connect;
 const svg = React.createFactory(require('react-native-svg').Svg);
-const sliceDataPoints = require('../lib/sliceDataPoints');
 const {line, curveMonotoneX, curveBasis, area} = require('d3-shape');
 const formatTemperature = require('../lib/format-temperature');
 const path = React.createFactory(require('react-native-svg').Path);
@@ -95,18 +94,8 @@ let atAreaFn = area()
  */
 function getSateFromProps(props) {
     let {
-        index,
-        timezones,
-        hourly,
-        dates,
-        currently
+        dataPoints
     } = props;
-    const dataPoints = sliceDataPoints(
-        hourly[index],
-        dates[index],
-        timezones[index],
-        currently[index]
-    );
     if (dataPoints.length === 24) {
         let points = addSpecialPoints(
             getPoints(dataPoints)
@@ -170,11 +159,7 @@ function getLabelPrefix(p) {
 module.exports = connect(
     state => {
         return {
-            hourly: state.hourly,
-            timezones: state.timezones,
-            dates: state.dates,
-            temperatureFormat: state.temperatureFormat,
-            currently: state.currently
+            temperatureFormat: state.temperatureFormat
             // useApparentTemperature: state.useApparentTemperature
         }
     }

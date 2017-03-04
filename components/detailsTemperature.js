@@ -18,8 +18,7 @@ const svgText = React.createFactory(require('react-native-svg').Text);
 const circle = React.createFactory(require('react-native-svg').Circle);
 const {scaleLinear} = require('d3-scale');
 const view = React.createFactory(require('react-native').View);
-const {interpolate} = require('d3-interpolate');
-
+const setStateAnimated = require('../lib/setStateAnimated');
 /**
  * @param  {number[]} tempAr
  * @return {{localMax: Number, localMin: Number}}
@@ -176,33 +175,18 @@ module.exports = connect(
             getSateFromProps(this.props)
         );
     },
+    componentWillMount: function () {
+        this.setStateAnimated = setStateAnimated(500);
+    },
     componentWillReceiveProps: function (props) {
         const newState = getSateFromProps(props);
         if (!newState.valid) {
             this.setState(newState);
             return;
         }
-        const start = Date.now();
-        const duration = 500;
-        const interpolator = interpolate(
-            this.state,
-            newState
-        );
-        this._animation = () => {
-            const now = Date.now();
-            let t = (now - start) / duration;
-            if (t > 1) {
-                t = 1;
-            }
-            this.setState(Object.assign(
-                interpolator(t),
-                {animationProgress: t}
-            ));
-            if (t < 1) {
-                requestAnimationFrame(this._animation);
-            }
-        }
-        requestAnimationFrame(this._animation);
+        this.setState({animationProgress: 0});
+        newState.animationProgress = 1;
+        this.setStateAnimated(newState);
     },
     render: function () {
         const {

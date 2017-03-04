@@ -12,7 +12,6 @@ const path = React.createFactory(require('react-native-svg').Path);
 const svg = React.createFactory(require('react-native-svg').Svg);
 const {scaleLinear, scaleThreshold} = require('d3-scale');
 const d3Path = require('d3-path').path;
-const setStateAnimated = require('../lib/setStateAnimated');
 
 //scales
 const bofort = scaleLinear()
@@ -48,7 +47,9 @@ function getSateFromProps(props) {
             points
         };
     }
-    return {};
+    return {
+        points: null
+    };
 }
 
 module.exports = React.createClass({
@@ -58,11 +59,8 @@ module.exports = React.createClass({
             getSateFromProps(this.props)
         );
     },
-    componentWillMount: function () {
-        this.setStateAnimated = setStateAnimated(500);
-    },
     componentWillReceiveProps: function (props) {
-        this.setStateAnimated(getSateFromProps(props));
+        this.setState(getSateFromProps(props));
     },
     render: function () {
         const {points} = this.state;
@@ -78,7 +76,6 @@ module.exports = React.createClass({
                 let x = xScale(hour);
                 let key = hour;
                 let curve = d3Path();
-                strokeWidth = Math.round(strokeWidth * 10) / 10;
                 curve.moveTo(x, y0 - l / 2);
                 curve.lineTo(x + l / 2, y0);
                 curve.lineTo(x, y0 + l / 2);

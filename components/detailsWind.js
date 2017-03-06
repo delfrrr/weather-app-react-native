@@ -10,6 +10,7 @@ const {width} = require('../lib/getDimensions')();
 const dWheight = 50;
 const path = React.createFactory(require('react-native-svg').Path);
 const svg = React.createFactory(require('react-native-svg').Svg);
+// const view = React.createFactory(require('react-native').View);
 const {scaleLinear, scaleThreshold} = require('d3-scale');
 const d3Path = require('d3-path').path;
 
@@ -69,8 +70,10 @@ module.exports = React.createClass({
         }
         return svg(
             {
+                key: 'detailsPrecip',
                 width,
-                height: dWheight
+                height: dWheight//,
+                // style: {backgroundColor: 'yellow'}
             },
             points.map(({hour, strokeWidth}) => {
                 let x = xScale(hour);

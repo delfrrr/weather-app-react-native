@@ -14,6 +14,7 @@ const touchableOpacity = React.createFactory(
 const locality = React.createFactory(require('./locality'));
 const detailsTemperature = React.createFactory(require('./detailsTemperature'));
 const detailsWind = React.createFactory(require('./detailsWind'));
+const detailsPrecip = React.createFactory(require('./detailsPrecip'));
 const hourScale = React.createFactory(require('./hourScale'));
 const connect = require('react-redux').connect;
 const store = require('../reducers/main');
@@ -114,7 +115,18 @@ module.exports = connect(
                             justifyContent: 'flex-end'
                         }
                     },
-                    detailsWind({dataPoints}),
+                    view(
+                        {
+                            style: {height: 50}
+                        },
+                        detailsPrecip({dataPoints})
+                    ),
+                    view(
+                        {
+                            style: {height: 50}
+                        },
+                        detailsWind({dataPoints})
+                    ),
                     detailsTemperature({dataPoints})
                 ),
                 hourScale({hours: [2, 6, 10, 14, 18, 22]})

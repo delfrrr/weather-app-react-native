@@ -7,10 +7,15 @@
 
 const React = require('react');
 const {width} = require('../lib/getDimensions')();
-const height = 40;
+const height = 50;
 const svg = React.createFactory(require('react-native-svg').Svg);
+const Defs = React.createFactory(require('react-native-svg').Defs);
+const Stop = React.createFactory(require('react-native-svg').Stop);
+const LinearGradient = React.createFactory(
+    require('react-native-svg').LinearGradient
+);
 const {scaleLinear} = require('d3-scale');
-const {area} = require('d3-shape');
+const {area, curveMonotoneX} = require('d3-shape');
 const path = React.createFactory(require('react-native-svg').Path);
 const setStateAnimated = require('../lib/setStateAnimated');
 
@@ -25,7 +30,7 @@ function getSateFromProps(props) {
     if (dataPoints.length === 24) {
         let points = dataPoints.map(({cloudCover}, hour) => {
             return {
-                cloudCover,
+                cloudCover: Math.round((cloudCover || 0) * 4) / 4,
                 hour
             }
         });
@@ -33,6 +38,20 @@ function getSateFromProps(props) {
     }
     return {};
 }
+
+const xScale = scaleLinear()
+    .domain([0, 23])
+    .range([0, width]);
+
+const yScale = scaleLinear()
+    .domain([0, 1])
+    .range([height, 0]);
+
+const areaFn = area()
+    .y0(p => yScale(p.cloudCover))
+    .y1(height)
+    .x((p) => xScale(p.hour))
+    .curve(curveMonotoneX);
 
 module.exports = React.createClass({
     getInitialState: function () {
@@ -52,38 +71,37 @@ module.exports = React.createClass({
         if (!points) {
             return null;
         }
-        const pixels = [];
-        for (let i = 0; i <= width; i++) {
-            pixels.push(i, i + .5);
-        }
-        const a = 1;
-        const b = 4 * Math.PI / width * 24;
-        const xScale = scaleLinear()
-            .domain([0, 23])
-            .range([0, width]);
-        const dxScale = scaleLinear()
-            .domain([0, 1])
-            .range([0, width / 24]);
-        let areaFn = area()
-            .y0(x => a * Math.sin(x * b) + a)
-            .y1(x => a * Math.sin(x * b) - a + height)
-            .defined(x => {
-                let key = Math.round(xScale.invert(x));
-                let x0 = xScale(key);
-                let {cloudCover} = points[key];
-                let dx = dxScale(cloudCover);
-                return Math.abs(x - x0) <= dx;
-            })
-            .x(x => x);
+        const d = areaFn(points);
         return svg(
             {
                 width,
                 height
             },
+            Defs(null,
+                LinearGradient(
+                    {
+                        id: 'grad',
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: height
+                    },
+                    Stop({
+                        offset: String(0),
+                        stopColor: 'rgba(255, 255, 255)',
+                        stopOpacity: .1
+                    }),
+                    Stop({
+                        offset: String(1),
+                        stopColor: 'rgba(255, 255, 255)',
+                        stopOpacity: 0
+                    })
+                )
+            ),
             path({
-                d: areaFn(pixels),
+                d,
                 strokeWidth: 0,
-                fill: 'rgba(255, 255, 255, .1)'
+                fill: 'url(#grad)'
             })
         );
     }

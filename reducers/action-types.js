@@ -30,7 +30,8 @@ const actions = [
     'SET_FORECAST_REQ',
     'SET_CHART_FORMAT',
     'OPEN_DETAILS',
-    'CLOSE_DETAILS'
+    'CLOSE_DETAILS',
+    'TOGGLE_CITY_SEARCH'
 ];
 
 /**

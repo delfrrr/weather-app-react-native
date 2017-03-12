@@ -26,6 +26,7 @@ module.exports = connect(
     function mapStateToProps(state) {
         return {
             citySelect: state.citySelect,
+            citySearch: state.citySearch,
             citySearchResult: state.citySearchResult,
             localities: state.localities,
             selectedLoacalitiesObj: state.selectedLoacalities.filter(Boolean).reduce(
@@ -41,15 +42,14 @@ module.exports = connect(
 )(React.createClass({
     getInitialState: function () {
         return {
-            searchFocused: false,
             inputValue: ''
         }
     },
     componentDidUpdate: function (prevProps) {
-        let {searchFocused, inputValue} = this.state;
-        let {citySearchResult} = this.props;
+        let {inputValue} = this.state;
+        let {citySearchResult, citySearch} = this.props;
         if (
-            searchFocused &&
+            citySearch &&
             Boolean(inputValue) &&
             citySearchResult !== prevProps.citySearchResult
         ) {
@@ -61,11 +61,12 @@ module.exports = connect(
         const {height} = Dimensions.get('window');
         const {
             citySelect,
+            citySearch,
             citySearchResult,
             localities,
             selectedLoacalitiesObj
         } = this.props;
-        const {searchFocused, inputValue} = this.state;
+        const {inputValue} = this.state;
         const top = citySelect ? 0 : -height;
         return blurView(
             {
@@ -100,8 +101,8 @@ module.exports = connect(
                         ref: 'textInput',
                         placeholder: 'Add city',
                         placeholderTextColor: 'rgba(255, 255, 255, 0.8)',
-                        onFocus: () => this.setState({searchFocused: true}),
-                        onBlur: () => this.setState({searchFocused: false}),
+                        onFocus: () => store.toggleCitySearch(),
+                        onBlur: () => store.toggleCitySearch(),
                         onChangeText: inputValue => {
                             store.lookupCity(inputValue);
                             this.setState({inputValue})
@@ -109,7 +110,7 @@ module.exports = connect(
                         value: inputValue || undefined
                     }
                 ),
-                searchFocused ?
+                citySearch ?
                 touchableOpacity(
                     {
                         style: {
@@ -154,7 +155,7 @@ module.exports = connect(
                     )
                 )
             ),
-            !searchFocused && scrollView(
+            !citySearch && scrollView(
                 {
                     keyboardShouldPersistTaps: true
                 },
@@ -184,7 +185,7 @@ module.exports = connect(
                     )
                 )
             ),
-            searchFocused && view(
+            citySearch && view(
                 {
                     // behavior: 'padding',
                     style: {

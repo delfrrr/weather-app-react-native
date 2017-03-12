@@ -9,6 +9,7 @@ const url = require('url');
 const moment = require('moment-timezone');
 const lodash = require('lodash');
 const {DARK_SKY_API_KEY, MAPZEN_API_KEY} = require('../credentials.json');
+const {LayoutAnimation} = require('react-native');
 //reverse geocoding endpoint
 const MAPZEN_BASE_URL = `https://search.mapzen.com/v1/?api_key=${
     MAPZEN_API_KEY
@@ -74,6 +75,25 @@ function getScalarReducer(actionType, initValue) {
 }
 
 /**
+ * @param  {string} toggleActionType
+ * @param  {Boolean} initValue
+ * @return {function} reducer
+ */
+function getBooleanReducer(toggleActionType, initValue) {
+    return (
+        value = initValue,
+        {type}
+    ) => {
+        switch (type) {
+            case toggleActionType:
+                return !value;
+            default:
+                return value;
+        }
+    }
+}
+
+/**
  * @return {string}
  */
 function getTemperatureFormat() {
@@ -124,14 +144,8 @@ module.exports = store = redux.createStore(redux.combineReducers({
     useApparentTemperature: getScalarReducer(
         actionTypes.SET_APPARENT_TEMPERATURE, true
     ),
-    citySelect: function (citySelect = false, action) {
-        switch (action.type) {
-            case actionTypes.TOGGLE_CITY_SELECT:
-                return !citySelect;
-            default:
-                return citySelect;
-        }
-    },
+    citySearch: getBooleanReducer(actionTypes.TOGGLE_CITY_SEARCH, false),
+    citySelect: getBooleanReducer(actionTypes.TOGGLE_CITY_SELECT, false),
     timezones: getColumnReducer(actionTypes.SET_TIMEZONE, [
         moment.tz.guess(), moment.tz.guess()
     ]),
@@ -199,6 +213,22 @@ module.exports = store = redux.createStore(redux.combineReducers({
     chartType: getScalarReducer(actionTypes.SET_CHART_FORMAT, 'bars')
 }));
 
+//handle layout animations
+const defaultAnimationDuration = 400;
+let animationDuration = defaultAnimationDuration;
+let nextAnimationDuration = null;
+store.subscribe(() => {
+    LayoutAnimation.configureNext(
+        LayoutAnimation.create(animationDuration, 'linear', 'opacity'),
+        () => {
+            if (typeof nextAnimationDuration === 'number') {
+                animationDuration = nextAnimationDuration;
+                nextAnimationDuration = null;
+            }
+        }
+    );
+});
+
 const propertiesToSave = [
     'locality',
     'localities',
@@ -239,6 +269,8 @@ module.exports.closeDateInput = function () {
 };
 
 module.exports.opensDetails = function (index) {
+    animationDuration = 200;
+    nextAnimationDuration = defaultAnimationDuration;
     this.dispatch({
         type: actionTypes.OPEN_DETAILS,
         index
@@ -246,6 +278,8 @@ module.exports.opensDetails = function (index) {
 };
 
 module.exports.closeDetails = function () {
+    animationDuration = 200;
+    nextAnimationDuration = defaultAnimationDuration;
     this.dispatch({
         type: actionTypes.CLOSE_DETAILS
     })
@@ -444,6 +478,18 @@ module.exports.setUseApparentTemperature = function (value) {
         value
     });
     this.setHourlyMinMax();
+}
+
+module.exports.toggleCitySearch = function () {
+    const {citySearch} = this.getState();
+    if (!citySearch) {
+        animationDuration = 0;
+    } else {
+        nextAnimationDuration = defaultAnimationDuration;
+    }
+    this.dispatch({
+        type: actionTypes.TOGGLE_CITY_SEARCH
+    });
 }
 
 module.exports.toggleBar = function (index) {

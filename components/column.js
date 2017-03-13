@@ -9,7 +9,6 @@ const touchableOpacity = React.createFactory(
 );
 const hourScale = React.createFactory(require('./hourScale'));
 const date = React.createFactory(require('./date'));
-const curve = React.createFactory(require('./curve'));
 const connect = require('react-redux').connect;
 const {Dimensions} = require('react-native');
 const store = require('../reducers/main');
@@ -21,13 +20,12 @@ const _ = require('lodash');
 module.exports = connect(
     function mapStateToProps(state) {
         return {
-            chartType: state.chartType,
             detailsShowed: typeof state.details === 'number'
         }
     }
 )(React.createClass({
     render: function () {
-        const {dateOpacity, index, chartType, detailsShowed} = this.props;
+        const {dateOpacity, index, detailsShowed} = this.props;
         const {width} = Dimensions.get('window');
         const barWidth = Math.ceil(width / 8);
         return view(
@@ -50,8 +48,6 @@ module.exports = connect(
                     opacity: dateOpacity
                 })
             ),
-            chartType === 'curve' ?
-            curve({index}) :
             detailsShowed ? null : touchableOpacity(
                 {
                     style: {

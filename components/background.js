@@ -63,8 +63,7 @@ module.exports = connect(
         return {
             hourRange: state.hourRange,
             hourly: state.hourly,
-            useApparentTemperature: state.useApparentTemperature,
-            chartType: state.chartType
+            useApparentTemperature: state.useApparentTemperature
         }
     }
 )(React.createClass({
@@ -106,7 +105,6 @@ module.exports = connect(
         let {width, viewHeight} = getDimensions();
         width += 2 * padding;
         const {stops} = this.state;
-        const {chartType} = this.props;
         return Svg(
             {
                 width,
@@ -131,9 +129,7 @@ module.exports = connect(
                         stopOpacity: 1
                     }),
                     Stop({
-                        offset: String(
-                            chartType === 'curve' ? 1 : .5
-                        ),
+                        offset: String(.5),
                         stopColor: stops[0][1],
                         stopOpacity: 1
                     })
@@ -152,9 +148,7 @@ module.exports = connect(
                         stopOpacity: 1
                     }),
                     Stop({
-                        offset: String(
-                            chartType === 'curve' ? 1 : .5
-                        ),
+                        offset: String(.5),
                         stopColor: stops[1][1],
                         stopOpacity: 1
                     })

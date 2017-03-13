@@ -40,8 +40,7 @@ module.exports = connect(
         return {
             temperatureFormat: state.temperatureFormat,
             useApparentTemperature: state.useApparentTemperature,
-            forecastApiRequests: state.forecastApiRequests,
-            chartType: state.chartType
+            forecastApiRequests: state.forecastApiRequests
         }
     }
 )(React.createClass({
@@ -82,8 +81,7 @@ module.exports = connect(
             temperatureFormat,
             useApparentTemperature,
             // onCitySelectPress,
-            forecastApiRequests,
-            chartType
+            forecastApiRequests
         } = this.props;
         const {width} = Dimensions.get('window');
         const rowStyle = {
@@ -200,28 +198,6 @@ module.exports = connect(
                         paddingBottom: 10
                     }
                 },
-                view(
-                    {
-                        style: [rowStyle]
-                    },
-                    view(
-                        {style: {flex: 1}},
-                        text({}, 'Chart type')
-                    ),
-                    segmentedControlIOS({
-                        style: {width: 90},
-                        tintColor: '#3599dd',
-                        onChange: ({nativeEvent}) => {
-                            if (nativeEvent.selectedSegmentIndex === 1) {
-                                store.setChartType('curve');
-                            } else {
-                                store.setChartType('bars');
-                            }
-                        },
-                        selectedIndex: chartType === 'curve' ? 1 : 0,
-                        values: ['Bars', 'Curve']
-                    })
-                ),
                 view(
                     {
                         style: [rowStyle]

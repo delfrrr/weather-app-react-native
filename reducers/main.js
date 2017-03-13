@@ -209,8 +209,7 @@ module.exports = store = redux.createStore(redux.combineReducers({
     citySearchResult: getScalarReducer(actionTypes.SET_CITY_SEARCH_RESULT, null),
     temperatureFormat: getScalarReducer(
         actionTypes.SET_TEMPERATURE_FORMAT, getTemperatureFormat()
-    ),
-    chartType: getScalarReducer(actionTypes.SET_CHART_FORMAT, 'bars')
+    )
 }));
 
 //handle layout animations
@@ -518,21 +517,12 @@ module.exports.setHourRange = function (selectedBars) {
 }
 
 module.exports.setHourlyMinMax = function () {
-    let {hourly, useApparentTemperature, chartType} = this.getState();
+    let {hourly} = this.getState();
     let tAr = hourly.reduce((tAr, dataBlock) => {
         if (dataBlock) {
-            if (chartType === 'bars') {
-                tAr.push(...dataBlock.data.map((dataPoint) => {
-                    return useApparentTemperature ?
-                        dataPoint.apparentTemperature :
-                        dataPoint.temperature;
-                }));
-            } else {
-                //only temperature
-                tAr.push(...dataBlock.data.map(
-                    dataPoint => dataPoint.temperature
-                ));
-            }
+            dataBlock.data.forEach((dataPoint) => {
+                tAr.push(dataPoint.temperature, dataPoint.apparentTemperature)
+            })
         }
         return tAr;
     }, []);

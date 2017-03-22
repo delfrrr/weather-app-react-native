@@ -113,6 +113,11 @@ module.exports = connect(
                     {
                         style: {
                             flex: .65,
+                            transform: [
+                                // {scale: 0.9}//,
+                                // {translateY: 20},
+                                // {translateX: -20}
+                            ],
                             justifyContent: 'flex-end'
                         }
                     },
@@ -134,9 +139,9 @@ module.exports = connect(
                         },
                         detailsWind({dataPoints})
                     ),
-                    detailsTemperature({dataPoints})
-                ),
-                hourScale({hours: [2, 6, 10, 14, 18, 22]})
+                    detailsTemperature({dataPoints}),
+                    hourScale({hours: [2, 6, 10, 14, 18, 22]})
+                )
             )
         );
     }

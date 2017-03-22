@@ -70,7 +70,7 @@ let xScale = scaleLinear()
     .domain([0, 23])
     .range([0, width]);
 
-let topPadding = 50;
+let topPadding = 45;
 let bottomPadding = 22;
 let yScale = scaleLinear()
     .range([dTHeight - bottomPadding, topPadding]);
@@ -122,16 +122,21 @@ function getSateFromProps(props) {
 
 /**
  * @param  {object[]} labeledPoints
- * @param  {function} xScaleParam d3-scale
+ * @param  {function} xScale d3-scale
  * @return {number[]} position of labels
  */
-function getLabelPoints(labeledPoints, xScaleParam) {
-    let xScale = xScaleParam
-        .copy()
-        .domain([0, labeledPoints.length]);
-    return labeledPoints.map((p, key) => {
-        return xScale(key + .5);
-    })
+function getLabelPoints(labeledPoints, xScale) {
+    const labelWidth = 30;
+    const labelPositions = [];
+    labeledPoints.forEach((p, key) => {
+        let min = (key + 1) * labelWidth;
+        if (labelPositions.length) {
+            min = labelPositions[key - 1] +labelWidth;
+        }
+        const max = width - (labeledPoints.length - key) * labelWidth;
+        labelPositions.push(Math.min(max, Math.max(min, xScale(p.hour))));
+    });
+    return labelPositions;
 }
 
 let labelsAnchorLineFn = line()

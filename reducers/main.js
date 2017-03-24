@@ -216,7 +216,8 @@ module.exports = store = redux.createStore(redux.combineReducers({
 const defaultAnimationDuration = 400;
 let animationDuration = defaultAnimationDuration;
 let nextAnimationDuration = null;
-store.subscribe(() => {
+
+function configureAnimation() {
     LayoutAnimation.configureNext(
         LayoutAnimation.create(animationDuration, 'linear', 'opacity'),
         () => {
@@ -226,7 +227,21 @@ store.subscribe(() => {
             }
         }
     );
-});
+}
+
+store.subscribe(configureAnimation);
+
+/**
+ * configure animation for next layout change
+ * @param  {number} [ad=defaultAnimationDuration] animation duration
+ */
+module.exports.configureAnimation = function (
+    ad = defaultAnimationDuration
+) {
+    animationDuration = ad;
+    nextAnimationDuration = defaultAnimationDuration;
+    configureAnimation();
+}
 
 const propertiesToSave = [
     'locality',

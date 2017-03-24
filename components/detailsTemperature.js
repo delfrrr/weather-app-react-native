@@ -19,6 +19,8 @@ const circle = React.createFactory(require('react-native-svg').Circle);
 const {scaleLinear} = require('d3-scale');
 const view = React.createFactory(require('react-native').View);
 const setStateAnimated = require('../lib/setStateAnimated');
+const store = require('../reducers/main');
+
 /**
  * @param  {number[]} tempAr
  * @return {{localMax: Number, localMin: Number}}
@@ -120,13 +122,14 @@ function getSateFromProps(props) {
     }
 }
 
+const labelWidth = 40;
+
 /**
  * @param  {object[]} labeledPoints
  * @param  {function} xScale d3-scale
  * @return {number[]} position of labels
  */
 function getLabelPoints(labeledPoints, xScale) {
-    const labelWidth = 30;
     const labelPositions = [];
     labeledPoints.forEach((p, key) => {
         let min = (key + 1) * labelWidth;
@@ -181,7 +184,9 @@ module.exports = connect(
         );
     },
     componentWillMount: function () {
-        this.setStateAnimated = setStateAnimated(500);
+        this.setStateAnimated = setStateAnimated(500, () => {
+            store.configureAnimation();
+        });
     },
     componentWillReceiveProps: function (props) {
         const newState = getSateFromProps(props);
@@ -190,8 +195,10 @@ module.exports = connect(
             return;
         }
         this.setState({animationProgress: 0});
-        newState.animationProgress = 1;
-        this.setStateAnimated(newState);
+        setTimeout(() => {
+            newState.animationProgress = 1;
+            this.setStateAnimated(newState);
+        })
     },
     render: function () {
         const {

@@ -7,25 +7,50 @@
 
 const React = require('react');
 const {width} = require('../lib/getDimensions')();
-const dWheight = 50;
+const dWheight = 32;
 const path = React.createFactory(require('react-native-svg').Path);
 const svg = React.createFactory(require('react-native-svg').Svg);
-// const view = React.createFactory(require('react-native').View);
+const view = React.createFactory(require('react-native').View);
+const text = React.createFactory(require('./text'));
 const {scaleLinear, scaleThreshold} = require('d3-scale');
 const d3Path = require('d3-path').path;
 
 //scales
-const bofort = scaleLinear()
+const beaufort = scaleLinear()
     .domain([0, .3, 1.6, 3.4, 5.5, 8, 10.8, 13.9, 17.2, 20.8]) // m/s
-    .range([0,  1,  2,   3,   4,   5, 6,    7, 8, 9]); //bofort
+    .range([0,  1,  2,   3,   4,   5, 6,    7, 8, 9]); //beaufort
+const beaufortLabel = scaleThreshold()
+    .domain([        2,            3,      4,     5,       6,            7,             8])
+    .range(['Calm', 'Light wind', 'Wind', 'Wind', 'Wind', 'Strong wind', 'Strong wind', 'Storm']);
 const y0 = dWheight / 2;
 const l = 15;
 const xScale = scaleLinear()
     .domain([0, 23])
     .range([l / 1.5, width - l / 1.5]);
 const strokeWidthScale = scaleThreshold()
-    .domain([  3, 4, 5, 6, 7, 8])
-    .range([ 0, 0, .5, 2, 2,  3, 4, 4]);
+    .domain([    2,  3,  4,   5,  6,   7, 8])
+    .range([ 0, .5,  1,  1.5, 2,  2.5, 3, 4]);
+
+const labelWidth = 100;
+
+/**
+ * @param  {Object[]} points
+ * @return {Object}
+ */
+function getExtremPoint(points) {
+    const slicePadding = Math.floor(xScale.invert(labelWidth / 2));
+    const slicedPoints = points.slice(
+        slicePadding,
+        points.length - 1 - slicePadding
+    );
+    let extremPoint = slicedPoints[0];
+    for (let i = 1; i < slicedPoints.length; i++) {
+        if (extremPoint.windSpeed < slicedPoints[i].windSpeed) {
+            extremPoint = slicedPoints[i];
+        }
+    }
+    return extremPoint;
+}
 
 /**
  * @param  {Object} props
@@ -37,14 +62,17 @@ function getSateFromProps(props) {
     } = props;
     if (dataPoints.length === 24) {
         let points = dataPoints.map((dp, hour) => {
-            let b = bofort(dp.windSpeed);
+            let b = beaufort(dp.windSpeed);
             let strokeWidth = strokeWidthScale(b);
             return {
                 hour,
+                windSpeed: dp.windSpeed,
+                b,
                 strokeWidth
             }
         });
         return {
+            extremPoint: getExtremPoint(points),
             points
         };
     }
@@ -64,33 +92,54 @@ module.exports = React.createClass({
         this.setState(getSateFromProps(props));
     },
     render: function () {
-        const {points} = this.state;
+        const {points, extremPoint} = this.state;
         if (!points) {
             return null;
         }
-        return svg(
-            {
-                key: 'detailsPrecip',
-                width,
-                height: dWheight//,
-                // style: {backgroundColor: 'yellow'}
-            },
-            points.map(({hour, strokeWidth}) => {
-                let x = xScale(hour);
-                let key = hour;
-                let curve = d3Path();
-                curve.moveTo(x, y0 - l / 2);
-                curve.lineTo(x + l / 2, y0);
-                curve.lineTo(x, y0 + l / 2);
-                let d = curve.toString();
-                return path({
-                    key,
-                    stroke: 'white',
-                    strokeWidth,
-                    fill: 'transparent',
-                    d
-                });
-            })
+        return view(
+            {},
+            extremPoint.strokeWidth > 0 ? view(
+                {},
+                text(
+                    {
+                        style: {
+                            position: 'relative',
+                            left: xScale(extremPoint.hour) - labelWidth / 2,
+                            width: labelWidth,
+                            fontSize: 12,
+                            textAlign: 'center'
+                        }
+                    },
+                    `${
+                        beaufortLabel(extremPoint.b)
+                    }\n${
+                        Math.round(extremPoint.windSpeed)
+                    }\u202Fm/s`
+                )
+            ) : null,
+            svg(
+                {
+                    key: 'detailsPrecip',
+                    width,
+                    height: dWheight
+                },
+                points.map(({hour, strokeWidth}) => {
+                    let x = xScale(hour);
+                    let key = hour;
+                    let curve = d3Path();
+                    curve.moveTo(x, y0 - l / 2);
+                    curve.lineTo(x + l / 2, y0);
+                    curve.lineTo(x, y0 + l / 2);
+                    let d = curve.toString();
+                    return path({
+                        key,
+                        stroke: 'white',
+                        strokeWidth,
+                        fill: 'transparent',
+                        d
+                    });
+                })
+            )
         );
     }
 });

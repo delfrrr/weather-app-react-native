@@ -135,7 +135,7 @@ module.exports = connect(
                     ),
                     view(
                         {
-                            style: {height: 50}
+                            style: {height: 75}
                         },
                         detailsWind({dataPoints})
                     ),

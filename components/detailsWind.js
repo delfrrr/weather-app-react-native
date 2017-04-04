@@ -31,7 +31,7 @@ const strokeWidthScale = scaleThreshold()
     .domain([    2,  3,  4,   5,  6,   7, 8])
     .range([ 0, .5,  1,  1.5, 2,  2.5, 3, 4]);
 
-const labelWidth = 100;
+const labelWidth = 130;
 
 /**
  * @param  {Object[]} points
@@ -112,7 +112,7 @@ module.exports = React.createClass({
                     },
                     `${
                         beaufortLabel(extremPoint.b)
-                    }\n${
+                    } ${
                         Math.round(extremPoint.windSpeed)
                     }\u202Fm/s`
                 )

@@ -123,19 +123,28 @@ module.exports = connect(
                     },
                     view(
                         {
-                            style: {height: 50}
+                            style: {
+                                height: 50//,
+                                // backgroundColor: 'blue'
+                            }
                         },
                         detailsCloudCoverage({dataPoints})
                     ),
                     view(
                         {
-                            style: {height: 50}
+                            style: {
+                                height: 50//,
+                                // backgroundColor: 'green'
+                            }
                         },
                         detailsPrecip({dataPoints})
                     ),
                     view(
                         {
-                            style: {height: 75}
+                            style: {
+                                height: 60//,
+                                // backgroundColor: 'orange'
+                            }
                         },
                         detailsWind({dataPoints})
                     ),

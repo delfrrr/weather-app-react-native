@@ -124,7 +124,7 @@ module.exports = connect(
                     view(
                         {
                             style: {
-                                height: 50//,
+                                height: 50
                                 // backgroundColor: 'blue'
                             }
                         },
@@ -133,7 +133,7 @@ module.exports = connect(
                     view(
                         {
                             style: {
-                                height: 50//,
+                                height: 75//,
                                 // backgroundColor: 'green'
                             }
                         },

@@ -20,11 +20,10 @@ const Rect = React.createFactory(require('react-native-svg').Rect);
 /**
  * @param {ForecastDataBlock[]} hourly
  * @param {number[]} hourRange
- * @param {boolean} useApparentTemperature
  * @param {number|null} index when need to show only one column
  * @returns {string[][]} colors
  */
-function getStops(hourly, hourRange, useApparentTemperature, index) {
+function getStops(hourly, hourRange, index) {
     let dataBlocks = hourly;
     if (typeof index === 'number') {
         dataBlocks = [hourly[index]];
@@ -33,11 +32,7 @@ function getStops(hourly, hourRange, useApparentTemperature, index) {
         const points = getDataPoints(dataBlock);
         if (points) {
             let targetTempAr = points.map(
-                p => {
-                    return useApparentTemperature ?
-                    p.apparentTemperature :
-                    p.temperature;
-                }
+                p => p.apparentTemperature
             );
             let maxTemp = Math.max(...targetTempAr.slice(...hourRange));
             let minTemp = Math.min(...targetTempAr.slice(...hourRange));
@@ -62,25 +57,23 @@ module.exports = connect(
     (state) => {
         return {
             hourRange: state.hourRange,
-            hourly: state.hourly,
-            useApparentTemperature: state.useApparentTemperature
+            hourly: state.hourly
         }
     }
 )(React.createClass({
     getInitialState() {
-        const {hourly, hourRange, useApparentTemperature, index} = this.props;
+        const {hourly, hourRange, index} = this.props;
         return {
-            stops: getStops(hourly, hourRange, useApparentTemperature, index)
+            stops: getStops(hourly, hourRange, index)
         };
     },
     componentWillReceiveProps(props) {
         const {
             hourly,
-            hourRange,
-            useApparentTemperature
+            hourRange
         } = props;
         const index = this.props.index;
-        let stops = getStops(hourly, hourRange, useApparentTemperature, index);
+        let stops = getStops(hourly, hourRange, index);
         const interpolator = interpolate(
             this.state,
             {stops}

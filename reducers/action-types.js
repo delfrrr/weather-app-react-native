@@ -15,7 +15,6 @@ const actions = [
     'SET_MAX_TEMPERATURE',
     'SET_TEMPERATURE_FORMAT',
     'TOGGLE_BAR',
-    'SET_APPARENT_TEMPERATURE', //on/off feels like temp
     'RESET_BAR',
     'SET_HOUR_RANGE',
     'TOGGLE_CITY_SELECT',

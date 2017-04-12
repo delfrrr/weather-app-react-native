@@ -7,7 +7,6 @@ const React = require('react');
 const text = React.createFactory(require('./text'));
 const nextIcon = React.createFactory(require('./nextIcon'));
 const view = React.createFactory(require('react-native').View);
-const switchCtl = React.createFactory(require('react-native').Switch);
 const segmentedControlIOS = React.createFactory(
     require('react-native').SegmentedControlIOS
 );
@@ -39,7 +38,6 @@ module.exports = connect(
     function mapStateToProps(state) {
         return {
             temperatureFormat: state.temperatureFormat,
-            useApparentTemperature: state.useApparentTemperature,
             forecastApiRequests: state.forecastApiRequests
         }
     }
@@ -79,7 +77,6 @@ module.exports = connect(
     render: function () {
         const {
             temperatureFormat,
-            useApparentTemperature,
             // onCitySelectPress,
             forecastApiRequests
         } = this.props;
@@ -212,32 +209,6 @@ module.exports = connect(
                         onChange: () => store.toggleTemperatureFormat(),
                         selectedIndex: temperatureFormat === 'C' ? 0 : 1,
                         values: ['C', 'F']
-                    })
-                ),
-                view(
-                    {
-                        style: [rowStyle]
-                    },
-                    text({
-                        style: {flex: 1}
-                    }, 'Feels like'),
-                    text(
-                        {
-                            style: {
-                                marginRight: 10,
-                                color: 'grey',
-                                width: 100
-                            }
-                        },
-                        useApparentTemperature ? 'Recommended' : ''
-                    ),
-                    switchCtl({
-                        tintColor: '#3599dd',
-                        onValueChange: (v) => store.setUseApparentTemperature(
-                            Boolean(v)
-                        ),
-                        value: useApparentTemperature,
-                        onTintColor: '#3599dd'
                     })
                 ),
                 view(

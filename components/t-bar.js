@@ -13,7 +13,6 @@ const wind = React.createFactory(require('./wind'));
 const snow = React.createFactory(require('./snow'));
 const connect = require('react-redux').connect;
 const getDataPoints = require('../lib/getDataPoints');
-const store = require('../reducers/main');
 const moment = require('moment');
 const formatTemperature = require('../lib/format-temperature');
 
@@ -38,11 +37,41 @@ function sliceDataPoints(hourly, startHour, date, timezone) {
     });
 }
 
-function getBarIndex(startHour) {
-    return startHour / (24 / 4);
+const bottomPadding = 0.2;
+
+/**
+ * @param  {number} temperature
+ * @param  {number} minTemperture
+ * @param  {number} maxTemperture
+ * @return {number} flex value
+ */
+function getBarHeight(
+    temperature,
+    minTemperture,
+    maxTemperture
+) {
+    let barHeight = (temperature - minTemperture) /
+        (maxTemperture - minTemperture) * (1 - bottomPadding);
+
+    barHeight += bottomPadding;
+    if (barHeight > 1) {
+        barHeight = 1;
+    }
+    return barHeight;
 }
 
-const bottomPadding = 0.2;
+/**
+ * @param  {number} temperatureC
+ * @param  {string} temperatureFormat C or F
+ * @return {number} temp in C rounded to C or to F
+ */
+function roundTemperature(temperatureC, temperatureFormat) {
+    if (temperatureFormat === 'F') {
+        return Math.round(temperatureC * 1.8) / 1.8;
+    } else {
+        return Math.round(temperatureC);
+    }
+}
 
 /**
  * @param  {Object} props
@@ -53,8 +82,8 @@ function getSateFromProps(props) {
         index,
         minTemperture,
         maxTemperture,
-        timezones,
-        useApparentTemperature
+        temperatureFormat,
+        timezones
     } = props;
     const hourly = props.hourly[index];
     const dataPoints = sliceDataPoints(
@@ -69,26 +98,19 @@ function getSateFromProps(props) {
             dataPoints: null
         };
     }
-    let targetTemperature;
-    if (useApparentTemperature) {
-        targetTemperature = dataPoints[3].apparentTemperature
-    } else {
-        //round to make same temp look same
-        targetTemperature = Math.round(dataPoints[3].temperature)
-    }
-    //one we will show
-    let temperature = Math.round(dataPoints[3].temperature);
+    let {temperature, apparentTemperature} = dataPoints[3];
 
-    //calculate flex value
-    let barHeight = (targetTemperature - minTemperture) /
-        (maxTemperture - minTemperture) * (1 - bottomPadding);
-
-    barHeight += bottomPadding;
-    if (barHeight > 1) {
-        barHeight = 1;
-    }
     return {
-        barHeight,
+        tBarHeight: getBarHeight(
+            roundTemperature(temperature, temperatureFormat),
+            minTemperture,
+            maxTemperture
+        ),
+        atBarHeight: getBarHeight(
+            roundTemperature(apparentTemperature, temperatureFormat),
+            minTemperture,
+            maxTemperture
+        ),
         temperature,
         dataPoints
     };
@@ -104,18 +126,9 @@ module.exports = connect(
             maxTemperture: state.maxTemperture,
             selectedBars: state.selectedBars,
             temperatureFormat: state.temperatureFormat,
-            useApparentTemperature: state.useApparentTemperature,
             citySelect: state.citySelect,
             details: state.details
         };
-    },
-    () => {
-        return {
-            onPress: function () {
-                let barIndex = getBarIndex(this.props.startHour);
-                store.toggleBar(barIndex);
-            }
-        }
     }
 )(React.createClass({
     getInitialState () {
@@ -128,17 +141,16 @@ module.exports = connect(
     },
     render: function () {
         const {
-            temperatureFormat, selectedBars, startHour, width
+            temperatureFormat, width
         } = this.props;
-        const {temperature, barHeight, dataPoints} = this.state;
-        if (!barHeight) {
+        const {temperature, tBarHeight, dataPoints, atBarHeight} = this.state;
+        if (!tBarHeight) {
             return null;
         }
-        const barIndex  = getBarIndex(startHour);
-        const selected = selectedBars[barIndex];
         const temperatureStr = formatTemperature(
             temperature, temperatureFormat
         );
+        let atBarFlex = Math.min(atBarHeight / tBarHeight, 1);
         return View(
             {
                 style: {
@@ -148,56 +160,58 @@ module.exports = connect(
             View(
                 {
                     style: {
-                        flex: 1 - barHeight,
-                        alignItems: 'flex-end'
+                        flex: 1 - tBarHeight,
+                        justifyContent: 'flex-end'
                     }
                 },
                 dataPoints ? View(
                     {
                         style: {
                             position: 'absolute',
-                            bottom: 18,
+                            bottom: 0,
                             left: 0,
                             right: 0,
-                            height: 100,
                             justifyContent: 'flex-end'
                         }
                     },
                     wind({dataPoints}),
                     snow({dataPoints}),
-                    rain({dataPoints})
-                ) : null
-            ),
-            View(
-                    {
-                        style: {
-                            flex: barHeight,
-                            backgroundColor: `rgba(255, 255, 255, ${
-                                selected ? 0.4 : 0.3
-                            })`
-                        }
-                    },
-                    View(
+                    rain({dataPoints}),
+                    text(
                         {
                             style: {
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                top: -18,
+                                textAlign: 'center',
                                 height: 18
                             }
                         },
-                        text(
-                            {
-                                style: {
-                                    textAlign: 'center',
-                                    height: 18
-                                }
-                            },
-                            temperatureStr
-                        )
+                        temperatureStr
                     )
+                ) : null
+            ),
+            View(
+                {
+                    style: {
+                        flex: tBarHeight,
+                        backgroundColor: `rgba(255, 255, 255, 0.2)`,
+                        justifyContent: 'flex-end'
+                    }
+                },
+                View(
+                    {
+                        style: {
+                            flex: 1 - atBarFlex
+                        }
+                    }
+                ),
+                View(
+                    {
+                        style: {
+                            flex: atBarFlex,
+                            backgroundColor: `rgba(255, 255, 255, 0.2)`
+                        }
+                    }
                 )
+            )
         );
     }
 }));

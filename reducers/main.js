@@ -141,9 +141,6 @@ module.exports = store = redux.createStore(redux.combineReducers({
                 return dateSelect;
         }
     },
-    useApparentTemperature: getScalarReducer(
-        actionTypes.SET_APPARENT_TEMPERATURE, true
-    ),
     citySearch: getBooleanReducer(actionTypes.TOGGLE_CITY_SEARCH, false),
     citySelect: getBooleanReducer(actionTypes.TOGGLE_CITY_SELECT, false),
     timezones: getColumnReducer(actionTypes.SET_TIMEZONE, [
@@ -248,8 +245,7 @@ const propertiesToSave = [
     'localities',
     'selectedLoacalities',
     'temperatureFormat',
-    'forecastApiRequests',
-    'useApparentTemperature'
+    'forecastApiRequests'
 ];
 const storageKey = 'reducers.main.store.state';
 function saveStore() {
@@ -483,17 +479,6 @@ module.exports.toggleCitySelect = function () {
     });
 }
 
-/**
- * @param {boolean} value
- */
-module.exports.setUseApparentTemperature = function (value) {
-    this.dispatch({
-        type: actionTypes.SET_APPARENT_TEMPERATURE,
-        value
-    });
-    this.setHourlyMinMax();
-}
-
 module.exports.toggleCitySearch = function () {
     const {citySearch} = this.getState();
     if (!citySearch) {
@@ -531,6 +516,8 @@ module.exports.setHourRange = function (selectedBars) {
     });
 }
 
+const tScales = [10, 20, 30, 50, 80, 130, 210];
+
 module.exports.setHourlyMinMax = function () {
     let {hourly} = this.getState();
     let tAr = hourly.reduce((tAr, dataBlock) => {
@@ -541,13 +528,23 @@ module.exports.setHourlyMinMax = function () {
         }
         return tAr;
     }, []);
+    //snap to fixed temp scale
+    let max = Math.ceil(Math.max(...tAr));
+    let min = Math.floor(Math.min(...tAr));
+    let t0 = Math.floor(min / 10) * 10;
+    let i = 0;
+    let maxDt = tScales[i];
+    while(maxDt && maxDt < (max - t0)) {
+        i++;
+        maxDt = tScales[i];
+    }
     this.dispatch({
         type: actionTypes.SET_MAX_TEMPERATURE,
-        value: Math.max(...tAr)
+        value: t0 + maxDt
     });
     this.dispatch({
         type: actionTypes.SET_MIN_TEMPERATURE,
-        value: Math.min(...tAr)
+        value: t0
     });
 }
 
@@ -683,8 +680,7 @@ module.exports.loadState = function () {
                 localities,
                 selectedLoacalities,
                 temperatureFormat,
-                forecastApiRequests,
-                useApparentTemperature
+                forecastApiRequests
             } = state;
             if (typeof forecastApiRequests === 'number') {
                 this.dispatch({
@@ -703,9 +699,6 @@ module.exports.loadState = function () {
                     type: 'SET_TEMPERATURE_FORMAT',
                     value: temperatureFormat
                 });
-            }
-            if (typeof useApparentTemperature === 'boolean') {
-                this.setUseApparentTemperature(useApparentTemperature);
             }
             if (selectedLoacalities && selectedLoacalities.length) {
                 this.setSelectedLocalities(selectedLoacalities);

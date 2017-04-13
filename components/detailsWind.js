@@ -16,9 +16,7 @@ const {scaleLinear, scaleThreshold} = require('d3-scale');
 const d3Path = require('d3-path').path;
 
 //scales
-const beaufort = scaleLinear()
-    .domain([0, .3, 1.6, 3.4, 5.5, 8, 10.8, 13.9, 17.2, 20.8]) // m/s
-    .range([0,  1,  2,   3,   4,   5, 6,    7, 8, 9]); //beaufort
+const beaufort = require('../lib/beaufort');
 const beaufortLabel = scaleThreshold()
     .domain([        2,            3,      4,     5,       6,            7,             8])
     .range(['Calm', 'Light wind', 'Wind', 'Wind', 'Wind', 'Strong wind', 'Strong wind', 'Storm']);

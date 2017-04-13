@@ -13,11 +13,20 @@ let Svg = React.createFactory(require('react-native-svg').Svg);
 let Circle = React.createFactory(require('react-native-svg').Circle);
 let Path = React.createFactory(require('react-native-svg').Path);
 let G = React.createFactory(require('react-native-svg').G);
-let scale = require('d3-scale').scaleLinear();
-//@see https://ru.wikipedia.org/wiki/Шкала_Бофорта
-let getDuration = scale
-    .domain([3, 10, Infinity])
-    .range([6000, 2000, 500]);
+const beaufort = require('../lib/beaufort');
+const {scaleThreshold} = require('d3-scale');
+const durationScale = scaleThreshold()
+    .domain([      3,    4,    5,    6,   7  ])
+    .range([ 6000, 6000, 3000, 1500, 750, 400]);
+
+/**
+ * @param  {number} windSpeed m/s
+ * @return {number} animation duration ms
+ */
+function getDuration(windSpeed) {
+    const b = beaufort(windSpeed);
+    return durationScale(b);
+}
 
 module.exports = React.createClass({
     getInitialState: function () {
@@ -31,7 +40,7 @@ module.exports = React.createClass({
         let {dataPoints} = this.props;
         let windyPoints = dataPoints.filter((p) => {
             return p.icon.match('wind') ||
-                p.windSpeed >= 6;
+                beaufort(p.windSpeed) >= 3;
         });
         if (windyPoints.length) {
             let maxWindSpeed = Math.max(

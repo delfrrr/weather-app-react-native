@@ -30,7 +30,9 @@ const actions = [
     'SET_CHART_FORMAT',
     'OPEN_DETAILS',
     'CLOSE_DETAILS',
-    'TOGGLE_CITY_SEARCH'
+    'TOGGLE_CITY_SEARCH',
+    'SET_UNIT_SYSTEM',
+    'SET_12H'
 ];
 
 /**

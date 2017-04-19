@@ -94,6 +94,23 @@ function getBooleanReducer(toggleActionType, initValue) {
 }
 
 /**
+ * @see https://en.wikipedia.org/wiki/12-hour_clock
+ * @return {Promise.<Boolean>}
+ */
+function detect12h() {
+    return NativeModules.Locale.dateFormat(Date.now(), 'short', 'short').then((d) => {
+        return Boolean(d.match(/[ap]m/i));
+    });
+}
+
+/**
+ * @return {string} us or metric
+ */
+function getUnitSystem() {
+    return NativeModules.Locale.measurementSystem === 'U.S.' ? 'us' : 'metric';
+}
+
+/**
  * @return {string}
  */
 function getTemperatureFormat() {
@@ -206,6 +223,12 @@ module.exports = store = redux.createStore(redux.combineReducers({
     citySearchResult: getScalarReducer(actionTypes.SET_CITY_SEARCH_RESULT, null),
     temperatureFormat: getScalarReducer(
         actionTypes.SET_TEMPERATURE_FORMAT, getTemperatureFormat()
+    ),
+    is12h: getScalarReducer(
+        actionTypes.SET_12H, false
+    ),
+    unitSystem: getScalarReducer(
+        actionTypes.SET_UNIT_SYSTEM, getUnitSystem()
     )
 }));
 
@@ -673,6 +696,15 @@ module.exports.setChartType = function (chartType) {
  * loads state from AsyncStorage
  */
 module.exports.loadState = function () {
+    //detect time format
+    detect12h().then((is12h) => {
+        this.dispatch({
+            type: actionTypes.SET_12H,
+            value: is12h
+        });
+    }).catch(reportError);
+
+    //load state from storage
     AsyncStorage.getItem(storageKey).then((stateStr) => {
         if (stateStr) {
             const state = JSON.parse(stateStr);

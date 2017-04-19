@@ -40,7 +40,7 @@ module.exports = React.createClass({
         let {dataPoints} = this.props;
         let windyPoints = dataPoints.filter((p) => {
             return p.icon.match('wind') ||
-                beaufort(p.windSpeed) >= 3;
+                beaufort(p.windSpeed) >= 4;
         });
         if (windyPoints.length) {
             let maxWindSpeed = Math.max(

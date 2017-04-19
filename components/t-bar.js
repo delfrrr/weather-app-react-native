@@ -192,14 +192,14 @@ module.exports = connect(
                 {
                     style: {
                         flex: tBarHeight,
-                        backgroundColor: `rgba(255, 255, 255, 0.2)`,
                         justifyContent: 'flex-end'
                     }
                 },
                 View(
                     {
                         style: {
-                            flex: 1 - atBarFlex
+                            flex: 1 - atBarFlex,
+                            backgroundColor: `rgba(255, 255, 255, 0.3)`
                         }
                     }
                 ),
@@ -207,7 +207,7 @@ module.exports = connect(
                     {
                         style: {
                             flex: atBarFlex,
-                            backgroundColor: `rgba(255, 255, 255, 0.2)`
+                            backgroundColor: `rgba(255, 255, 255, 0.4)`
                         }
                     }
                 )

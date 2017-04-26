@@ -94,7 +94,7 @@ function getBooleanReducer(toggleActionType, initValue) {
 }
 
 /**
- * @see https://en.wikipedia.org/wiki/12-hour_clock
+s * @see https://en.wikipedia.org/wiki/12-hour_clock
  * @return {Promise.<Boolean>}
  */
 function detect12h() {
@@ -225,7 +225,7 @@ module.exports = store = redux.createStore(redux.combineReducers({
         actionTypes.SET_TEMPERATURE_FORMAT, getTemperatureFormat()
     ),
     is12h: getScalarReducer(
-        actionTypes.SET_12H, false
+        actionTypes.SET_12H, null
     ),
     unitSystem: getScalarReducer(
         actionTypes.SET_UNIT_SYSTEM, getUnitSystem()

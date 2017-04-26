@@ -79,6 +79,20 @@ function getSateFromProps(props) {
     };
 }
 
+/**
+ * @param  {number} speed      m/s
+ * @param  {string} unitSystem us or metric
+ * @return {string}
+ */
+function formatWindSpeed(speed, unitSystem) {
+    switch (unitSystem) {
+        case 'us':
+            return Math.round(speed * 3.6 / 1.60934) + '\u202Fmph'
+        default:
+            return Math.round(speed) + '\u202Fm/s'
+    }
+}
+
 module.exports = React.createClass({
     getInitialState: function () {
         return Object.assign(
@@ -91,6 +105,7 @@ module.exports = React.createClass({
     },
     render: function () {
         const {points, extremPoint} = this.state;
+        const {unitSystem} = this.props;
         if (!points) {
             return null;
         }
@@ -111,8 +126,9 @@ module.exports = React.createClass({
                     `${
                         beaufortLabel(extremPoint.b)
                     } ${
-                        Math.round(extremPoint.windSpeed)
-                    }\u202Fm/s`
+                        formatWindSpeed(extremPoint.windSpeed, unitSystem)
+                        // Math.round(extremPoint.windSpeed)
+                    }`
                 )
             ) : null,
             svg(

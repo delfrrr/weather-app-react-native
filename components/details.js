@@ -36,7 +36,8 @@ module.exports = connect(
         }
         return {
             index,
-            dataPoints
+            dataPoints,
+            unitSystem: state.unitSystem
         };
     }
 )(React.createClass({
@@ -46,7 +47,8 @@ module.exports = connect(
     render() {
         const {
             index,
-            dataPoints
+            dataPoints,
+            unitSystem
         } = this.props;
         if (index === null) {
             return null;
@@ -146,7 +148,7 @@ module.exports = connect(
                                 // backgroundColor: 'orange'
                             }
                         },
-                        detailsWind({dataPoints})
+                        detailsWind({dataPoints, unitSystem})
                     ),
                     detailsTemperature({dataPoints}),
                     hourScale({hours: [2, 6, 10, 14, 18, 22]})

@@ -7,10 +7,18 @@
 const React = require('react');
 const view = React.createFactory(require('react-native').View);
 const text = React.createFactory(require('./text'));
-
-module.exports = React.createClass({
+const connect = require('react-redux').connect;
+module.exports = connect((state) => {
+    const {is12h} = state;
+    return {
+        is12h
+    };
+})(React.createClass({
     render() {
-        const {hours} = this.props;
+        const {hours, is12h} = this.props;
+        if (is12h === null) {
+            return null;
+        }
         return view(
             {
                 style: {
@@ -24,8 +32,21 @@ module.exports = React.createClass({
             },
             hours.map((h, key) => {
                 let sufix = '';
-                if (key === 0 || key === hours.length - 1 ) {
-                    sufix = 'h';
+                let prefix = String(h);
+                if (is12h) {
+                    if (h <= 12) {
+                        sufix = 'am';
+                    } else {
+                        sufix = 'pm';
+                    }
+                    prefix = String(h % 12);
+                } else {
+                    if (
+                        key === 0 ||
+                        key === hours.length - 1
+                    ) {
+                        sufix = 'h';
+                    }
                 }
                 return text(
                     {
@@ -38,9 +59,9 @@ module.exports = React.createClass({
                             fontSize: 10
                         }
                     },
-                    h + sufix
+                    prefix + sufix
                 );
             })
         )
     }
-});
+}));

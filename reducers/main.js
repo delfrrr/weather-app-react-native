@@ -422,7 +422,10 @@ function fetchWeather(feature, ts) {
         coordinates[0]
     },${ts}?units=si`;
     return safeFetch(url).then((res) => {
-        const resDate = new Date(res.headers.map.date[0]);
+        //TODO:headers are not parsing correctly
+        const resDate = new Date(
+            res.headers.map.date ? res.headers.map.date[0] : Date.now()
+        );
         if (!lastDate) {
             //we relly only on date from server
             lastDate = resDate;

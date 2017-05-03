@@ -157,7 +157,7 @@ module.exports = connect(
             ),
             !citySearch && scrollView(
                 {
-                    keyboardShouldPersistTaps: true
+                    keyboardShouldPersistTaps: 'always'
                 },
                 localities.map((feature) => {
                     let id = feature.properties.id;
@@ -195,7 +195,7 @@ module.exports = connect(
                 citySearchResult && Boolean(inputValue) && scrollView(
                     {
                         ref: ref => {this.searchScrollViewInstance = ref},
-                        keyboardShouldPersistTaps: true
+                        keyboardShouldPersistTaps: 'always'
                     },
                     citySearchResult.map((feature) => {
                         return touchableHighlight(

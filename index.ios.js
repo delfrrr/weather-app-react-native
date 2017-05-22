@@ -23,6 +23,7 @@ const reload = React.createFactory(require('./components/reload'));
 const citySelect = React.createFactory(require('./components/city-select'));
 const details = React.createFactory(require('./components/details'));
 const options = React.createFactory(require('./components/options'));
+const inAppStore = React.createFactory(require('./components/inAppStore'));
 const styles = StyleSheet.create({
     header: {
         flex: 0.35
@@ -247,7 +248,8 @@ let zowninative = React.createClass({
                                     })
                                 )
                             ),
-                            details()
+                            details(),
+                            inAppStore()
                         )
                     ),
                     options({

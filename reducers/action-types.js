@@ -32,7 +32,10 @@ const actions = [
     'CLOSE_DETAILS',
     'TOGGLE_CITY_SEARCH',
     'SET_UNIT_SYSTEM',
-    'SET_12H'
+    'SET_12H',
+    'RAISE_FORECAST_API_LIMIT',
+    'SET_SHOW_STORE',
+    'SET_FORECAST_API_LIMIT'
 ];
 
 /**

@@ -18,6 +18,7 @@
     "react-native": "^0.44.0",
     "react-native-blur": "^3.0.0-alpha",
     "react-native-fbsdk": "^0.5.0",
+    "react-native-in-app-utils": "^5.2.3",
     "react-native-locale": "0.0.16",
     "react-native-svg": "^5.1.8",
     "react-redux": "~4.4.5",

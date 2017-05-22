@@ -38,7 +38,8 @@ module.exports = connect(
     function mapStateToProps(state) {
         return {
             temperatureFormat: state.temperatureFormat,
-            forecastApiRequests: state.forecastApiRequests
+            forecastApiRequests: state.forecastApiRequests,
+            forecastApiLimit: state.forecastApiLimit
         }
     }
 )(React.createClass({
@@ -78,6 +79,7 @@ module.exports = connect(
         const {
             temperatureFormat,
             // onCitySelectPress,
+            forecastApiLimit,
             forecastApiRequests
         } = this.props;
         const {width} = Dimensions.get('window');
@@ -298,40 +300,31 @@ module.exports = connect(
                                     style: {color: 'grey'}
                                 },
                                 `${
-                                    10000 - forecastApiRequests
+                                    forecastApiLimit - forecastApiRequests
                                 } requests left`
                             )
                         ),
                         touchableOpacity(
                             {
                                 style: {
-                                    width: 48,
+                                    width: 75,
                                     height: 48,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginRight: -5
+                                    alignItems: 'flex-end',
+                                    justifyContent: 'center'
                                 },
                                 onPress: () => {
-                                    AlertIOS.alert(
-                                        `Zowni app is powered by Dark Sky weather API, which is paid. Beta test edition includes 10000 API request quota. In public version I will offer some way to extend API quota.`
-                                    );
+                                    store.showStore();
                                 }
                             },
                             text(
                                 {
                                     style: {
-                                        width: 24,
-                                        height: 24,
-                                        borderRadius: 12,
-                                        borderWidth: 1,
-                                        borderStyle: 'solid',
-                                        borderColor: '#3599dd',
                                         color: '#3599dd',
-                                        textAlign: 'center',
-                                        lineHeight: 24
+                                        width: 75,
+                                        textAlign: 'right'
                                     }
                                 },
-                                'i'
+                                'Buy more'
                             )
                         )
                     )

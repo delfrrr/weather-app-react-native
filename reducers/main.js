@@ -5,6 +5,7 @@
 
 const redux = require('redux');
 const {AsyncStorage, Alert, NativeModules} = require('react-native');
+const {InAppUtils, Locale} = NativeModules;
 const url = require('url');
 const moment = require('moment-timezone');
 const lodash = require('lodash');
@@ -98,7 +99,7 @@ s * @see https://en.wikipedia.org/wiki/12-hour_clock
  * @return {Promise.<Boolean>}
  */
 function detect12h() {
-    return NativeModules.Locale.dateFormat(Date.now(), 'short', 'short').then((d) => {
+    return Locale.dateFormat(Date.now(), 'short', 'short').then((d) => {
         return Boolean(d.match(/[ap]m/i));
     });
 }
@@ -107,14 +108,14 @@ function detect12h() {
  * @return {string} us or metric
  */
 function getUnitSystem() {
-    return NativeModules.Locale.measurementSystem === 'U.S.' ? 'us' : 'metric';
+    return Locale.measurementSystem === 'U.S.' ? 'us' : 'metric';
 }
 
 /**
  * @return {string}
  */
 function getTemperatureFormat() {
-    return NativeModules.Locale.measurementSystem === 'U.S.' ? 'F' : 'C';
+    return Locale.measurementSystem === 'U.S.' ? 'F' : 'C';
 }
 
 let store;
@@ -205,6 +206,16 @@ module.exports = store = redux.createStore(redux.combineReducers({
                 return hourRange;
         }
     },
+    forecastApiLimit: function (forecastApiLimit = 200, action) {
+        switch (action.type) {
+            case actionTypes.RAISE_FORECAST_API_LIMIT:
+                return forecastApiLimit + action.value;
+            case actionTypes.SET_FORECAST_API_LIMIT:
+                return action.value;
+            default:
+                return forecastApiLimit;
+        }
+    },
     forecastApiRequests: function (forecastApiRequests = 0, action) {
         switch (action.type) {
             case actionTypes.FORECAST_REQUEST:
@@ -221,6 +232,9 @@ module.exports = store = redux.createStore(redux.combineReducers({
     minTemperture: getScalarReducer(actionTypes.SET_MIN_TEMPERATURE, 0),
     maxTemperture: getScalarReducer(actionTypes.SET_MAX_TEMPERATURE, 0),
     citySearchResult: getScalarReducer(actionTypes.SET_CITY_SEARCH_RESULT, null),
+    inAppStore: getScalarReducer(
+        actionTypes.SET_SHOW_STORE, false
+    ),
     temperatureFormat: getScalarReducer(
         actionTypes.SET_TEMPERATURE_FORMAT, getTemperatureFormat()
     ),
@@ -268,9 +282,10 @@ const propertiesToSave = [
     'localities',
     'selectedLoacalities',
     'temperatureFormat',
-    'forecastApiRequests'
+    'forecastApiRequests',
+    'forecastApiLimit'
 ];
-const storageKey = 'reducers.main.store.state';
+const storageKey = 'reducers.main.store.state-b91';
 function saveStore() {
     var stateToSave = {};
     var state = store.getState();
@@ -316,6 +331,24 @@ module.exports.closeDetails = function () {
     this.dispatch({
         type: actionTypes.CLOSE_DETAILS
     })
+};
+
+module.exports.showStore = function () {
+    // animationDuration = 200;
+    // nextAnimationDuration = defaultAnimationDuration;
+    this.dispatch({
+        type: actionTypes.SET_SHOW_STORE,
+        value: true
+    });
+};
+
+module.exports.hideStore = function () {
+    // animationDuration = 200;
+    // nextAnimationDuration = defaultAnimationDuration;
+    this.dispatch({
+        type: actionTypes.SET_SHOW_STORE,
+        value: false
+    });
 };
 
 module.exports.lookupCity = function (inputText) {
@@ -422,7 +455,7 @@ function fetchWeather(feature, ts) {
         coordinates[0]
     },${ts}?units=si`;
     return safeFetch(url).then((res) => {
-        //TODO:headers are not parsing correctly
+        //headers may not be parsing correctly
         const resDate = new Date(
             res.headers.map.date ? res.headers.map.date[0] : Date.now()
         );
@@ -695,6 +728,20 @@ module.exports.setChartType = function (chartType) {
     this.setHourlyMinMax();
 }
 
+function loadProducts(products = [
+    'org.reactjs.native.example.zowninative.twokrequests'
+]) {
+    return new Promise((resolve, reject) => {
+        return InAppUtils.loadProducts(products, (err, res) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(res);
+            }
+        });
+    })
+}
+
 /**
  * loads state from AsyncStorage
  */
@@ -715,8 +762,15 @@ module.exports.loadState = function () {
                 localities,
                 selectedLoacalities,
                 temperatureFormat,
-                forecastApiRequests
+                forecastApiRequests,
+                forecastApiLimit
             } = state;
+            if (typeof forecastApiLimit === 'number') {
+                this.dispatch({
+                    type: actionTypes.SET_FORECAST_API_LIMIT,
+                    value: forecastApiLimit
+                });
+            }
             if (typeof forecastApiRequests === 'number') {
                 this.dispatch({
                     type: actionTypes.SET_FORECAST_REQ,
@@ -745,6 +799,13 @@ module.exports.loadState = function () {
         }
 
     }).catch(reportError);
+
+    //load products
+    // loadProducts(
+    //     ['org.reactjs.native.example.zowninative.twokrequests']
+    // ).then((p) => {
+    //     console.log(p);
+    // });
 }
 
 /**

@@ -35,6 +35,7 @@ const actions = [
     'SET_12H',
     'RAISE_FORECAST_API_LIMIT',
     'SET_SHOW_STORE',
+    'SET_PRODUCTS',
     'SET_FORECAST_API_LIMIT'
 ];
 

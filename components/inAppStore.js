@@ -8,6 +8,7 @@ const React = require('react');
 const text = React.createFactory(require('./text'));
 const modal = React.createFactory(require('react-native').Modal);
 const view = React.createFactory(require('react-native').View);
+const activityIndicator = React.createFactory(require('react-native').ActivityIndicator);
 const {width, height, statusBarHeight} = require('../lib/getDimensions')();
 const touchable = React.createFactory(
     require('react-native').TouchableWithoutFeedback
@@ -19,18 +20,21 @@ module.exports = connect(
     function mapStateToProps({
         inAppStore,
         forecastApiLimit,
-        forecastApiRequests
+        forecastApiRequests,
+        products
     }) {
         return {
             inAppStore,
-            requestLeft: forecastApiLimit - forecastApiRequests
+            requestLeft: forecastApiLimit - forecastApiRequests,
+            products
         };
     }
 )(React.createClass({
     render() {
         const {
             inAppStore,
-            requestLeft
+            requestLeft,
+            products
         } = this.props;
         if (!inAppStore) {
             return null;
@@ -73,7 +77,10 @@ module.exports = connect(
                         style: {
                             borderRadius: 10,
                             backgroundColor: 'white',
-                            padding: 20
+                            padding: 20,
+                            paddingBottom: 0,
+                            overflow: 'hidden',
+                            alignItems: 'center'
                         }
                     },
                     view(
@@ -104,12 +111,58 @@ module.exports = connect(
                             {
                                 style: {
                                     marginTop: 10,
+                                    textAlign: 'center',
                                     fontWeight: '200',
                                     color: 'black'
                                 }
                             },
-                            `Zowni app is powered by Dark Sky weather API, which is paid`
+                            `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid.`
                         )
+                    ),
+                    view(
+                        {
+                            style: {
+                                height: 100,
+                                justifyContent: 'center'
+                            }
+                        },
+                        products && products.length ? products.map((p, key) => {
+                            return view(
+                                {
+                                    key,
+                                    style: {
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        paddingLeft: 40,
+                                        paddingRight: 40
+                                    }
+                                },
+                                text(
+                                    {
+                                        style: {
+                                            color: 'black',
+                                            width: 140
+                                        }
+                                    },
+                                    p.title
+                                ),
+                                text(
+                                    {
+                                        style: {
+                                            width: 60,
+                                            lineHeight: 25,
+                                            borderRadius: 5,
+                                            marginLeft: 20,
+                                            textAlign: 'center',
+                                            color: 'rgb(17, 107, 255)',
+                                            borderWidth: 1,
+                                            borderColor: 'rgb(17, 107, 255)'
+                                        }
+                                    },
+                                    `${p.price}${p.currencySymbol}`
+                                )
+                            )
+                        }) : activityIndicator()
                     )
                 )
             )

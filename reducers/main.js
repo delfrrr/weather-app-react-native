@@ -235,6 +235,9 @@ module.exports = store = redux.createStore(redux.combineReducers({
     inAppStore: getScalarReducer(
         actionTypes.SET_SHOW_STORE, false
     ),
+    products: getScalarReducer(
+        actionTypes.SET_PRODUCTS, null
+    ),
     temperatureFormat: getScalarReducer(
         actionTypes.SET_TEMPERATURE_FORMAT, getTemperatureFormat()
     ),
@@ -334,12 +337,23 @@ module.exports.closeDetails = function () {
 };
 
 module.exports.showStore = function () {
+    const {products} = this.getState();
     // animationDuration = 200;
     // nextAnimationDuration = defaultAnimationDuration;
     this.dispatch({
         type: actionTypes.SET_SHOW_STORE,
         value: true
     });
+    if (!products) {
+        loadProducts(
+            ['org.reactjs.native.example.zowninative.twokrequests']
+        ).then((p) => {
+            this.dispatch({
+                type: actionTypes.SET_PRODUCTS,
+                value: p
+            });
+        }).catch(reportError);
+    }
 };
 
 module.exports.hideStore = function () {
@@ -799,13 +813,6 @@ module.exports.loadState = function () {
         }
 
     }).catch(reportError);
-
-    //load products
-    // loadProducts(
-    //     ['org.reactjs.native.example.zowninative.twokrequests']
-    // ).then((p) => {
-    //     console.log(p);
-    // });
 }
 
 /**

@@ -224,6 +224,62 @@ module.exports = connect(
                                 alignItems: 'center',
                                 flex: 1
                             },
+                            onPress: () => {
+                                store.showStore();
+                            }
+                        },
+                        view(
+                            {
+                                style: {flex: 1}
+                            },
+                            text({}, 'Powered by Dark\u00A0Sky')
+                        ),
+                        view(
+                            {
+                                style: {marginRight: 0}
+                            },
+                            text(
+                                {
+                                    style: {color: 'grey'}
+                                },
+                                `${
+                                    forecastApiLimit - forecastApiRequests
+                                } requests left`
+                            )
+                        ),
+                        view(
+                            {
+                                style: {
+                                    width: 75,
+                                    height: 48,
+                                    alignItems: 'flex-end',
+                                    justifyContent: 'center'
+                                }
+                            },
+                            text(
+                                {
+                                    style: {
+                                        color: '#3599dd',
+                                        width: 75,
+                                        textAlign: 'right'
+                                    }
+                                },
+                                'Buy more'
+                            )
+                        )
+                    )
+                ),
+                view(
+                    {
+                        style: [rowStyle]
+                    },
+                    touchableOpacity(
+                        {
+                            style: {
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                flex: 1
+                            },
                             onPress: this.shareInMessanger
                         },
                         view(
@@ -271,62 +327,6 @@ module.exports = connect(
                             text({}, 'Report problem')
                         ),
                         nextIcon()
-                    )
-                ),
-                view(
-                    {
-                        style: [rowStyle]
-                    },
-                    view(
-                        {
-                            style: {
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                flex: 1
-                            }
-                        },
-                        view(
-                            {
-                                style: {flex: 1}
-                            },
-                            text({}, 'Powered by Dark\u00A0Sky')
-                        ),
-                        view(
-                            {
-                                style: {marginRight: 0}
-                            },
-                            text(
-                                {
-                                    style: {color: 'grey'}
-                                },
-                                `${
-                                    forecastApiLimit - forecastApiRequests
-                                } requests left`
-                            )
-                        ),
-                        touchableOpacity(
-                            {
-                                style: {
-                                    width: 75,
-                                    height: 48,
-                                    alignItems: 'flex-end',
-                                    justifyContent: 'center'
-                                },
-                                onPress: () => {
-                                    store.showStore();
-                                }
-                            },
-                            text(
-                                {
-                                    style: {
-                                        color: '#3599dd',
-                                        width: 75,
-                                        textAlign: 'right'
-                                    }
-                                },
-                                'Buy more'
-                            )
-                        )
                     )
                 )
             )

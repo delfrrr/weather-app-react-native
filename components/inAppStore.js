@@ -13,6 +13,9 @@ const {width, height, statusBarHeight} = require('../lib/getDimensions')();
 const touchable = React.createFactory(
     require('react-native').TouchableWithoutFeedback
 );
+const touchableOpacity = React.createFactory(
+    require('react-native').TouchableOpacity
+);
 const connect = require('react-redux').connect;
 const store = require('../reducers/main');
 
@@ -78,7 +81,6 @@ module.exports = connect(
                             borderRadius: 10,
                             backgroundColor: 'white',
                             padding: 20,
-                            paddingBottom: 0,
                             overflow: 'hidden',
                             alignItems: 'center'
                         }
@@ -105,7 +107,7 @@ module.exports = connect(
                                     fontSize: 20
                                 }
                             },
-                            'requests left'
+                            'weather requests left'
                         ),
                         text(
                             {
@@ -116,7 +118,8 @@ module.exports = connect(
                                     color: 'black'
                                 }
                             },
-                            `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid.`
+                            // `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid and cannot be used continuesly for free.`
+                            `But good news is that you can increase your API qouta!`
                         )
                     ),
                     view(
@@ -163,6 +166,22 @@ module.exports = connect(
                                 )
                             )
                         }) : activityIndicator()
+                    ),
+                    touchableOpacity(
+                        {
+                            onPress: () => {
+                                store.hideStore();
+                            }
+                        },
+                        text(
+                            {
+                                style: {
+                                    color: 'rgb(17, 107, 255)',
+                                    fontSize: 18
+                                }
+                            },
+                            'Later'
+                        )
                     )
                 )
             )

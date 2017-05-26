@@ -42,6 +42,8 @@ module.exports = connect(
         if (!inAppStore) {
             return null;
         }
+        const shop = inAppStore === 'shop' || null;
+        const leave = inAppStore === 'leave' || null;
         return modal(
             {
                 transparent: true,
@@ -109,7 +111,7 @@ module.exports = connect(
                             },
                             'weather requests left'
                         ),
-                        text(
+                        shop && text(
                             {
                                 style: {
                                     marginTop: 10,
@@ -122,7 +124,7 @@ module.exports = connect(
                             `But good news is that you can increase your API qouta!`
                         )
                     ),
-                    view(
+                    shop && view(
                         {
                             style: {
                                 height: 100,
@@ -149,21 +151,30 @@ module.exports = connect(
                                     },
                                     p.title
                                 ),
-                                text(
+                                touchableOpacity(
                                     {
-                                        style: {
-                                            width: 60,
-                                            lineHeight: 25,
-                                            borderRadius: 5,
-                                            marginLeft: 20,
-                                            textAlign: 'center',
-                                            color: 'rgb(17, 107, 255)',
-                                            borderWidth: 1,
-                                            borderColor: 'rgb(17, 107, 255)'
+                                        onPress: () => {
+                                            store.purchaseProduct(
+                                                p.identifier
+                                            )
                                         }
                                     },
-                                    `${p.price}${p.currencySymbol}`
-                                )
+                                    text(
+                                        {
+                                            style: {
+                                                width: 60,
+                                                lineHeight: 25,
+                                                borderRadius: 5,
+                                                marginLeft: 20,
+                                                textAlign: 'center',
+                                                color: 'rgb(17, 107, 255)',
+                                                borderWidth: 1,
+                                                borderColor: 'rgb(17, 107, 255)'
+                                            }
+                                        },
+                                        `${p.price}${p.currencySymbol}`
+                                    )
+                                ),
                             )
                         }) : activityIndicator()
                     ),
@@ -176,11 +187,12 @@ module.exports = connect(
                         text(
                             {
                                 style: {
+                                    marginTop: leave ? 20 : 0,
                                     color: 'rgb(17, 107, 255)',
                                     fontSize: 18
                                 }
                             },
-                            'Later'
+                            shop ? 'Later' : 'Continue'
                         )
                     )
                 )

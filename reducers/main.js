@@ -233,7 +233,7 @@ module.exports = store = redux.createStore(redux.combineReducers({
     maxTemperture: getScalarReducer(actionTypes.SET_MAX_TEMPERATURE, 0),
     citySearchResult: getScalarReducer(actionTypes.SET_CITY_SEARCH_RESULT, null),
     inAppStore: getScalarReducer(
-        actionTypes.SET_SHOW_STORE, false
+        actionTypes.SET_SHOW_STORE, null
     ),
     products: getScalarReducer(
         actionTypes.SET_PRODUCTS, null
@@ -342,7 +342,7 @@ module.exports.showStore = function () {
     // nextAnimationDuration = defaultAnimationDuration;
     this.dispatch({
         type: actionTypes.SET_SHOW_STORE,
-        value: true
+        value: 'shop'
     });
     if (!products) {
         loadProducts(
@@ -355,6 +355,25 @@ module.exports.showStore = function () {
         }).catch(reportError);
     }
 };
+
+module.exports.purchaseProduct = function (productIdentifier) {
+    purchaseProduct(productIdentifier).then((/*{transactionReceipt}*/) => {
+        const {forecastApiLimit} = this.getState();
+        this.dispatch({
+            type: actionTypes.SET_FORECAST_API_LIMIT,
+            value: forecastApiLimit + 2000
+        });
+        this.dispatch({
+            type: actionTypes.SET_SHOW_STORE,
+            value: 'leave'
+        });
+        // if (!transactionReceipt) {
+        //     //log error
+        // }
+    }, () => {
+        //it's ok let's do nothing
+    });
+}
 
 module.exports.hideStore = function () {
     // animationDuration = 200;
@@ -747,6 +766,18 @@ function loadProducts(products = [
 ]) {
     return new Promise((resolve, reject) => {
         return InAppUtils.loadProducts(products, (err, res) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(res);
+            }
+        });
+    })
+}
+
+function purchaseProduct(productIdentifier) {
+    return new Promise((resolve, reject) => {
+        return InAppUtils.purchaseProduct(productIdentifier, (err, res) => {
             if (err) {
                 reject(err);
             } else {

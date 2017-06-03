@@ -371,7 +371,7 @@ module.exports.purchaseProduct = function (productIdentifier) {
         //     //log error
         // }
     }, () => {
-        //it's ok let's do nothing
+        //it's ok let's do nothing for now
     });
 }
 
@@ -777,6 +777,8 @@ function loadProducts(products = [
 
 function purchaseProduct(productIdentifier) {
     return new Promise((resolve, reject) => {
+        // resolve({});
+        // return;
         return InAppUtils.purchaseProduct(productIdentifier, (err, res) => {
             if (err) {
                 reject(err);

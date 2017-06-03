@@ -111,7 +111,7 @@ module.exports = connect(
                             },
                             'weather requests left'
                         ),
-                        shop && text(
+                        text(
                             {
                                 style: {
                                     marginTop: 10,
@@ -120,8 +120,10 @@ module.exports = connect(
                                     color: 'black'
                                 }
                             },
+
                             // `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid and cannot be used continuesly for free.`
-                            `But good news is that you can increase your API qouta!`
+                            shop ? `But good news is that you can increase your API qouta!` :
+                            leave ? `Thank you for purhase! Enjoy the app!` : null
                         )
                     ),
                     shop && view(

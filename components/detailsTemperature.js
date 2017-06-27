@@ -284,8 +284,18 @@ module.exports = connect(
                             fill: 'white',
                             textAnchor: 'middle'
                         },
-                        `${getLabelPrefix(p)}\n${formatTemperature(
-                            p.t, temperatureFormat, ' '
+                        `${getLabelPrefix(p)}`
+                    ));
+                    elems.push(svgText(
+                        {
+                            x: labelP[0] - (p.t ? 5 : 0),
+                            y: 14,
+                            fontSize: 12,
+                            fill: 'white',
+                            textAnchor: 'middle'
+                        },
+                        `${formatTemperature(
+                            p.t, temperatureFormat
                         )}`
                     ));
                     return g({key}, ...elems);

@@ -122,7 +122,7 @@ module.exports = connect(
                             },
 
                             // `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid and cannot be used continuesly for free.`
-                            shop ? `But good news is that you can increase your API qouta!` :
+                            shop ? `To show you weather Zowni needs paid access to weather data from Dark Sky` :
                             leave ? `Thank you for purhase! Enjoy the app!` : null
                         )
                     ),
@@ -151,7 +151,7 @@ module.exports = connect(
                                             width: 140
                                         }
                                     },
-                                    p.title
+                                    `Get ${p.title}`
                                 ),
                                 touchableOpacity(
                                     {

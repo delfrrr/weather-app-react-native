@@ -288,7 +288,7 @@ const propertiesToSave = [
     'forecastApiRequests',
     'forecastApiLimit'
 ];
-const storageKey = 'reducers.main.store.state-b91';
+const storageKey = 'reducers.main.store.state-b94';
 function saveStore() {
     var stateToSave = {};
     var state = store.getState();
@@ -469,15 +469,9 @@ let lastDate = null;
  */
 function fetchWeather(feature, ts) {
     const {coordinates} = feature.geometry;
-    const {forecastApiRequests} = store.getState();
-    if (forecastApiRequests > 10000) {
-        showAlert(
-            'Dark Sky API limit exceeded',
-            `It means that you used your API limit before I introduced ` +
-            `in-app purchase.\n` +
-            `Try to update app from app-store or contact me to ` +
-            `bilonenko.v@gmail.com`
-        );
+    const {forecastApiRequests, forecastApiLimit} = store.getState();
+    if (forecastApiRequests > forecastApiLimit) {
+        store.showStore();
         return new Promise(() => {});
     }
     let url = `https://api.forecast.io/forecast/${

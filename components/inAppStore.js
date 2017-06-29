@@ -9,7 +9,7 @@ const text = React.createFactory(require('./text'));
 const modal = React.createFactory(require('react-native').Modal);
 const view = React.createFactory(require('react-native').View);
 const activityIndicator = React.createFactory(require('react-native').ActivityIndicator);
-const {width, height, statusBarHeight} = require('../lib/getDimensions')();
+const {width, height/*, statusBarHeight*/} = require('../lib/getDimensions')();
 const touchable = React.createFactory(
     require('react-native').TouchableWithoutFeedback
 );
@@ -120,10 +120,8 @@ module.exports = connect(
                                     color: 'black'
                                 }
                             },
-
-                            // `Zowni app is powered by Dark Sky weather API. Unfortunatly, it is paid and cannot be used continuesly for free.`
-                            shop ? `To show you weather Zowni needs paid access to weather data from Dark Sky` :
-                            leave ? `Thank you for purhase! Enjoy the app!` : null
+                            shop ? `To show you weather Zowni needs to pay for access to weather data from Dark Sky` :
+                            leave ? `Thank you for purchase! Enjoy the app!` : null
                         )
                     ),
                     shop && view(
@@ -176,7 +174,7 @@ module.exports = connect(
                                         },
                                         `${p.price}${p.currencySymbol}`
                                     )
-                                ),
+                                )
                             )
                         }) : activityIndicator()
                     ),

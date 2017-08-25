@@ -13,7 +13,7 @@ The source code is published for knowledge sharing purposes.
 
 
 * [Veiw full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
-* [Get invite on Apple TestFlight](https://zowni.com)
+* [Download from AppStore](https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8)
 
 
 # Used components
@@ -45,4 +45,4 @@ Check `package.json` for details
 * setup FacebookSDK as [described here](https://github.com/facebook/react-native-fbsdk)
 * type `$ ./node_modules/.bin/react-native link`
 
-Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just download it from [App Store](https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8) and try.
+Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just [download it from AppStore](https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8) and try.

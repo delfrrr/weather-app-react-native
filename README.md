@@ -7,7 +7,7 @@ The source code is published for knowledge sharing purposes.
 <table>
     <tr>
         <td><a href="https://www.youtube.com/watch?v=Z0eKfLKoo7w"><img src="http://i.giphy.com/Ow17HWlGTmtfG.gif" alt="Weather-App-React-Native"/></a></td>
-        <td><a title="iOS app for comparing weather forecast with historical data" href="https://zowni.com"><img src="http://i.imgur.com/IKRKgOL.png" alt="Get invite on Apple TestFlight"/></a></td>
+        <td><a title="iOS app for comparing weather forecast with historical data" href="https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8"><img src="http://i.imgur.com/VWmlW7M.png" alt="Get invite on Apple TestFlight"/></a></td>
     </tr>
 </table>
 
@@ -45,4 +45,4 @@ Check `package.json` for details
 * setup FacebookSDK as [described here](https://github.com/facebook/react-native-fbsdk)
 * type `$ ./node_modules/.bin/react-native link`
 
-Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just leave your email at https://zowni.com and get a link to download the app.
+Then you can follow [react-native docs to run on device](https://facebook.github.io/react-native/docs/running-on-device-ios.html#content). Or just download it from [App Store](https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8) and try.

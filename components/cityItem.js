@@ -11,6 +11,7 @@ const selectIcon = React.createFactory(require('./selectIcon'));
 const view = React.createFactory(require('react-native').View);
 const store = require('../reducers/main');
 const scrollView = React.createFactory(require('react-native').ScrollView);
+const getFeatureLabel = require('../lib/getFeatureLabel');
 const touchableHighlight = React.createFactory(
     require('react-native').TouchableHighlight
 );
@@ -36,7 +37,7 @@ module.exports = React.createClass({
         const {width} = Dimensions.get('window');
         const {scrollEnabled} = this.state;
         const {feature, selected, editDisabled} = this.props;
-        const localityAr = feature.properties.label.split(',');
+        const localityAr = getFeatureLabel(feature).split(',');
         return view(
             null,
             scrollView(

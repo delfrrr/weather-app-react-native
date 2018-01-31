@@ -9,6 +9,8 @@ const text = React.createFactory(require('./text'));
 const textInput = React.createFactory(require('react-native').TextInput);
 const view = React.createFactory(require('react-native').View);
 const scrollView = React.createFactory(require('react-native').ScrollView);
+const getFeatureId = require('../lib/getFeatureId');
+const getFeatureLabel = require('../lib/getFeatureLabel');
 const blurView = React.createFactory(
     require('react-native-blur').BlurView
 );
@@ -33,7 +35,7 @@ module.exports = connect(
                 (
                     selectedLoacalitiesObj, feature
                 ) => {
-                    selectedLoacalitiesObj[feature.properties.id] = 1;
+                    selectedLoacalitiesObj[getFeatureId(feature)] = 1;
                     return selectedLoacalitiesObj;
                 }, {}
             )
@@ -160,7 +162,7 @@ module.exports = connect(
                     keyboardShouldPersistTaps: 'always'
                 },
                 localities.map((feature) => {
-                    let id = feature.properties.id;
+                    let id = getFeatureId(feature);
                     return cityItem({
                         editDisabled: localities.length === 1,
                         feature,
@@ -200,7 +202,7 @@ module.exports = connect(
                     citySearchResult.map((feature) => {
                         return touchableHighlight(
                             {
-                                key: feature.properties.id,
+                                key: getFeatureId(feature),
                                 style: {
                                     height: 45,
                                     paddingLeft: 15
@@ -221,7 +223,7 @@ module.exports = connect(
                                             lineHeight: 45
                                         }
                                     },
-                                    feature.properties.label
+                                    getFeatureLabel(feature)
                                 )
                             )
                         );

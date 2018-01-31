@@ -5,6 +5,7 @@
 const React = require('react');
 const text = React.createFactory(require('./text'));
 const connect = require('react-redux').connect;
+const getFeatureLabel = require('../lib/getFeatureLabel');
 const view = React.createFactory(
     require('react-native').View
 );
@@ -28,7 +29,7 @@ const get1ColumnsSize = scaleLinear().range(
  * @return {string}
  */
 function getLabel(feature) {
-    return feature && feature.properties.label.split(',')[0];
+    return getFeatureLabel(feature).split(',')[0];
 }
 
 module.exports = connect(

@@ -23,7 +23,7 @@ The source code is published for knowledge sharing purposes.
 * d3.js (interpolate, scale, shape)
 * react-native-svg
 
-Check `package.json` for details  
+Check `package.json` for details
 
 # Used API
 
@@ -34,12 +34,12 @@ Check `package.json` for details
 
 * clone repo
 * type`$ npm install`
-* create file `./credentials.json`    
+* create file `./credentials.json`
 
 ```
 {
     "DARK_SKY_API_KEY": "{DARK_SKY_API_KEY}",
-    "MAPZEN_API_KEY": "{MAPZEN_API_KEY}"
+    "MAPBOX_API_KEY": "{MAPBOX_API_KEY}"
 }
 ```
 * setup FacebookSDK as [described here](https://github.com/facebook/react-native-fbsdk)

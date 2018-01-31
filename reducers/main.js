@@ -9,15 +9,14 @@ const {InAppUtils, Locale} = NativeModules;
 const url = require('url');
 const moment = require('moment-timezone');
 const lodash = require('lodash');
-const {DARK_SKY_API_KEY, MAPZEN_API_KEY} = require('../credentials.json');
+const {DARK_SKY_API_KEY, MAPBOX_API_KEY} = require('../credentials.json');
 const {LayoutAnimation} = require('react-native');
-//reverse geocoding endpoint
-const MAPZEN_BASE_URL = `https://search.mapzen.com/v1/?api_key=${
-    MAPZEN_API_KEY
+const GEOCODE_URL = `https://api.mapbox.com/geocoding/v5/mapbox.places/?access_token=${
+    MAPBOX_API_KEY
 }`;
 const reportError = require('../lib/reportError');
-const showAlert = require('../lib/showAlert');
 const actionTypes = require('./action-types');
+const getFeatureId = require('../lib/getFeatureId');
 
 /**
  * @returns {Date[]}
@@ -132,7 +131,7 @@ module.exports = store = redux.createStore(redux.combineReducers({
             case actionTypes.REMOVE_LOCALITY:
                 return localities.filter((feature) => {
                     return (
-                        feature.properties.id !== action.feature.properties.id
+                        getFeatureId(feature) !== getFeatureId(action.feature)
                     );
                 });
             default:
@@ -388,14 +387,14 @@ module.exports.lookupCity = function (inputText) {
     if (!inputText) {
         return;
     }
-    const mapzenUrlObj = url.parse(MAPZEN_BASE_URL, true);
-    delete mapzenUrlObj.search;
-    mapzenUrlObj.query.text = inputText;
-    mapzenUrlObj.query.limit = 10;
-    mapzenUrlObj.query.layers = 'locality';
-    mapzenUrlObj.pathname += 'search';
-    const mapzenUrl = url.format(mapzenUrlObj);
-    safeFetch(mapzenUrl).then(res => res.json()).then((res) => {
+    const geocodeUrlObj = url.parse(GEOCODE_URL, true);
+    delete geocodeUrlObj.search;
+    // geocodeUrlObj.query.text = inputText;
+    geocodeUrlObj.query.limit = 10;
+    geocodeUrlObj.query.types = 'place';
+    geocodeUrlObj.pathname += `${inputText}.json`;
+    const geocodeUrl = url.format(geocodeUrlObj);
+    safeFetch(geocodeUrl).then(res => res.json()).then((res) => {
         this.dispatch({
             type: actionTypes.SET_CITY_SEARCH_RESULT,
             value: res.features
@@ -665,7 +664,7 @@ module.exports.setSelectedLocalities = function (selectedLoacalities) {
 module.exports.addLocality = function (feature) {
     const {localities} = this.getState();
     const sameLocalities = localities.filter((locality) => {
-        return locality.properties.id === feature.properties.id;
+        return getFeatureId(locality) === getFeatureId(feature);
     });
     if (sameLocalities.length === 0) {
         this.dispatch({
@@ -683,10 +682,10 @@ module.exports.addLocality = function (feature) {
 module.exports.removeLocality = function (feature) {
     const {selectedLoacalities, localities} = this.getState();
     const otherLocalities = localities.filter((locality) => {
-        return locality.properties.id !== feature.properties.id;
+        return getFeatureId(locality) !== getFeatureId(feature);
     });
     const otherSelectedLocalities = selectedLoacalities.filter((locality) => {
-        return locality.properties.id !== feature.properties.id;
+        return getFeatureId(locality) !== getFeatureId(feature);
     });
 
     if (otherLocalities.length) {
@@ -731,7 +730,7 @@ module.exports.toggleTemperatureFormat = function () {
 module.exports.toggleSelectedLoacality = function (feature) {
     const {selectedLoacalities, localities} = this.getState();
     const otherLocalities = selectedLoacalities.filter((locality) => {
-        return locality.properties.id !== feature.properties.id
+        return getFeatureId(locality) !== getFeatureId(feature)
     });
     if (otherLocalities.length === selectedLoacalities.length) {
         //add
@@ -872,15 +871,14 @@ function getCurrentPosition() {
  */
 module.exports.setPosition = function () {
     getCurrentPosition().then((position) => {
-        let mapzenUrlObj = url.parse(MAPZEN_BASE_URL, true);
-        delete mapzenUrlObj.search;
-        mapzenUrlObj.query['point.lat'] = position.coords.latitude;
-        mapzenUrlObj.query['point.lon'] = position.coords.longitude;
-        mapzenUrlObj.query['layers'] = 'locality';
-        mapzenUrlObj.query['size'] = 1;
-        mapzenUrlObj.pathname += 'reverse';
-        let mapzenUrl = url.format(mapzenUrlObj);
-        return safeFetch(mapzenUrl);
+        const {longitude, latitude} = position.coords;
+        const geocodeUrlObj = url.parse(GEOCODE_URL, true);
+        delete geocodeUrlObj.search;
+        geocodeUrlObj.query.limit = 1;
+        geocodeUrlObj.query.types = 'place';
+        geocodeUrlObj.pathname += `${longitude},${latitude}.json`;
+        const geocodeUrl = url.format(geocodeUrlObj);
+        return safeFetch(geocodeUrl);
     }).then((res) => res.json()).then((res) => {
         const feature = res.features[0];
         this.addLocality(feature);

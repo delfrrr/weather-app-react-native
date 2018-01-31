@@ -41,6 +41,12 @@
       "idiom" : "iphone",
       "filename" : "icon-60-stripes@3x.png",
       "scale" : "3x"
+    },
+    {
+      "size" : "1024x1024",
+      "idiom" : "ios-marketing",
+      "filename" : "icon-60-stripes-1024-2.png",
+      "scale" : "1x"
     }
   ],
   "info" : {

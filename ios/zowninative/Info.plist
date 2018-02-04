@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>99</string>
+	<string>101</string>
 	<key>FacebookAppID</key>
 	<string>327227487644093</string>
 	<key>FacebookDisplayName</key>
@@ -58,7 +58,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Your location will be used only once to display weather in your current city</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>we need access to photos for some reason</string>
 	<key>UILaunchStoryboardName</key>

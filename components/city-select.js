@@ -238,7 +238,7 @@ module.exports = connect(
                     },
                     text(
                         {},
-                        'Search powered by Mapzen'
+                        'Search powered by Mapbox'
                     )
                 )
             )

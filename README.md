@@ -28,7 +28,7 @@ Check `package.json` for details
 # Used API
 
 * [DarkSky](https://darksky.net/dev/) for weather forecast and historical data
-* [Mapzen](https://mapzen.com/developers/sign_in) for city search
+* [Mapbox](https://www.mapbox.com/geocoding/) for city search
 
 # Install
 

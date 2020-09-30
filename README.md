@@ -1,4 +1,4 @@
-# Weather-App-React-Native
+# Weather-Forecast-Comparison-App-React-Native
 
 iOS app for comparing weather forecast with historical data built with [react-native](https://facebook.github.io/react-native/).
 The source code is published for knowledge sharing purposes.
@@ -12,7 +12,7 @@ The source code is published for knowledge sharing purposes.
 </table>
 
 
-* [Veiw full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
+* [View full screencast on YouTube](https://www.youtube.com/watch?v=Z0eKfLKoo7w)
 * [Download from AppStore](https://itunes.apple.com/us/app/zowni/id1140299292?ls=1&mt=8)
 
 
@@ -23,7 +23,7 @@ The source code is published for knowledge sharing purposes.
 * d3.js (interpolate, scale, shape)
 * react-native-svg
 
-Check `package.json` for details
+Check `package.json` for details.
 
 # Used API
 
@@ -32,7 +32,7 @@ Check `package.json` for details
 
 # Install
 
-* clone repo
+* clone repository
 * type`$ npm install`
 * create file `./credentials.json`
 
